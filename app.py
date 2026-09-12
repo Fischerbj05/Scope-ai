@@ -41,8 +41,7 @@ if not api_key:
 
 if not api_key:
     st.error(
-        "OpenAI API key not found. Add OPENAI_API_KEY "
-        "to Streamlit Secrets."
+        "OpenAI API key not found. Add OPENAI_API_KEY to Streamlit Secrets."
     )
     st.stop()
 
@@ -94,7 +93,6 @@ def pdf_pages_to_images(uploaded_file, max_pages):
     for page_index in range(number_of_pages):
         page = document.load_page(page_index)
 
-        # Higher resolution for construction notes/dimensions
         matrix = fitz.Matrix(1.7, 1.7)
 
         pix = page.get_pixmap(
@@ -263,10 +261,7 @@ def create_pdf_report(project_name, analysis_text):
 
     story = []
 
-    # ------------------------------------------------------
     # COVER PAGE
-    # ------------------------------------------------------
-
     story.append(Spacer(1, 1.3 * inch))
 
     story.append(
@@ -305,10 +300,7 @@ def create_pdf_report(project_name, analysis_text):
 
     story.append(PageBreak())
 
-    # ------------------------------------------------------
     # TABLE OF CONTENTS
-    # ------------------------------------------------------
-
     story.append(
         Paragraph(
             "Table of Contents",
@@ -333,13 +325,9 @@ def create_pdf_report(project_name, analysis_text):
     ]
 
     story.append(toc)
-
     story.append(PageBreak())
 
-    # ------------------------------------------------------
     # REPORT SECTIONS
-    # ------------------------------------------------------
-
     section_names = [
         "EXECUTIVE SUMMARY",
         "PROJECT RISK SUMMARY",
@@ -365,6 +353,7 @@ def create_pdf_report(project_name, analysis_text):
     ]
 
     for line in analysis_text.splitlines():
+
         clean = line.strip()
 
         if not clean:
@@ -374,28 +363,40 @@ def create_pdf_report(project_name, analysis_text):
         if clean.startswith("===="):
             continue
 
-        clean = (
-            clean
+        # REMOVE MARKDOWN HEADING SYMBOLS
+        display_text = clean
+
+        if display_text.startswith("### "):
+            display_text = display_text[4:].strip()
+        elif display_text.startswith("## "):
+            display_text = display_text[3:].strip()
+        elif display_text.startswith("# "):
+            display_text = display_text[2:].strip()
+
+        # ESCAPE REPORTLAB CHARACTERS
+        safe_text = (
+            display_text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
         )
 
-        if clean.upper() in section_names:
+        # MAIN REPORT SECTIONS
+        if display_text.upper() in section_names:
             story.append(
                 Paragraph(
-                    clean,
+                    safe_text,
                     heading_style
                 )
             )
 
         else:
-            if clean.startswith("- "):
-                clean = "• " + clean[2:]
+            if safe_text.startswith("- "):
+                safe_text = "• " + safe_text[2:]
 
             story.append(
                 Paragraph(
-                    clean,
+                    safe_text,
                     body_style
                 )
             )
@@ -412,7 +413,6 @@ def create_pdf_report(project_name, analysis_text):
         )
     )
 
-    # multiBuild is required so the TOC can calculate page numbers
     document.multiBuild(story)
 
     buffer.seek(0)
@@ -429,90 +429,16 @@ You are an advanced AI construction scope, drawing-revision,
 change-management, project-risk, code-awareness, and contract-document
 analysis assistant.
 
-You will receive:
-1. Text extracted from original construction documents.
-2. Text extracted from revised construction documents.
-3. Images of original plan sheets when visual analysis is enabled.
-4. Images of revised plan sheets when visual analysis is enabled.
+Use both document text and visual drawing information when supplied.
 
-Use BOTH document text and visible drawing information.
+Do not invent facts, quantities, dimensions, prices, dates,
+code sections, contract language, owner requirements, or company policies.
 
-Analyze potential:
-- scope changes
-- drawing revisions
-- dimensions
-- quantities
-- materials
-- labor impacts
-- equipment impacts
-- schedule impacts
-- productivity impacts
-- trade coordination
-- code concerns
-- regional requirements
-- safety concerns
-- contract/documentation risks
-- procurement impacts
-- rework
-- owner requirements
-- company requirements
-
-VISUAL DRAWING REVIEW:
-
-When images are supplied, inspect plan sheets for:
-- dimensions
-- thicknesses
-- elevations
-- quantities
-- materials
-- callouts
-- keynotes
-- detail references
-- section references
-- structural notes
-- equipment
-- doors
-- walls
-- slabs
-- reinforcement
-- MEP information
-- penetrations
-- utilities
-- grading
-- finishes
-- revision clouds
-- delta symbols
-- revision notes
-- schedules
-- added work
-- deleted work
-- relocated work
-
-IMPORTANT RULES:
-
-- Do not provide legal advice.
-- Do not make a final legal determination.
-- Do not state that payment is definitely owed.
-- Do not invent facts.
-- Do not invent contract language.
-- Do not invent quantities.
-- Do not invent dimensions.
-- Do not invent prices.
-- Do not invent dates.
-- Do not invent delay durations.
-- Do not invent code sections.
-- Do not invent local amendments.
-- Do not invent owner requirements.
-- Do not invent company policies.
-- Clearly distinguish confirmed facts from assumptions.
-- Clearly identify missing information.
-- Clearly identify items requiring verification.
-- Cite document names and page numbers whenever possible.
-- If visual evidence is unclear, say so.
-- Do not claim to see something that is not visible.
-- Consider both direct and indirect impacts.
-- Consider other trades and adjacent work.
-- Be detailed but do not create unsupported problems.
+Clearly distinguish:
+- confirmed facts
+- assumptions
+- missing information
+- items requiring verification
 
 ==================================================
 EXECUTIVE SUMMARY
@@ -533,7 +459,6 @@ REVIEW BEFORE PROCEEDING:
 YES / NO
 
 SUMMARY:
-Provide a concise summary of the major finding.
 
 ==================================================
 PROJECT RISK SUMMARY
@@ -571,433 +496,112 @@ State the number of meaningful YELLOW risks and summarize them.
 MOST IMPORTANT NEXT ACTION:
 Give one clear action the contractor or project manager should take first.
 
-Do not exaggerate risk.
-Only include supported risks or clearly identified assumptions.
-
 ==================================================
 VISUAL DRAWING COMPARISON
 ==================================================
 
-If drawing images were supplied, identify meaningful visible changes.
+If drawing images are supplied, compare original and revised sheets.
 
-For each change use:
+For each meaningful change provide:
 
 CHANGE:
-
 ORIGINAL DRAWING:
-
 ORIGINAL PAGE:
-
 REVISED DRAWING:
-
 REVISED PAGE:
-
 ORIGINAL CONDITION:
-
 REVISED CONDITION:
-
 POTENTIAL IMPACT:
-
 CONFIDENCE:
-
-If no visual images were supplied, state that visual comparison
-was not performed.
 
 ==================================================
 PROJECT AND JURISDICTION INFORMATION
 ==================================================
 
-Identify when available:
+Identify project name, location, owner, GC, subcontractor,
+design professional, AHJ, project type, and code information when available.
 
-PROJECT NAME:
-
-PROJECT LOCATION:
-
-CITY:
-
-COUNTY:
-
-STATE:
-
-COUNTRY:
-
-OWNER:
-
-GENERAL CONTRACTOR:
-
-SUBCONTRACTOR:
-
-DESIGN PROFESSIONAL:
-
-AUTHORITY HAVING JURISDICTION:
-
-PROJECT TYPE:
-
-APPLICABLE CODE INFORMATION:
-
-PROJECT-SPECIFIC STANDARDS:
-
-If information is missing, write NOT PROVIDED.
-
-If user-entered information conflicts with the documents,
-clearly flag the conflict.
+Flag conflicts.
 
 ==================================================
 ORIGINAL CONTRACTED REQUIREMENT
 ==================================================
 
-Describe the original requirements.
-
-Include where available:
-- dimensions
-- quantities
-- materials
-- location
-- responsibilities
-- exclusions
-- limitations
-- drawing requirements
-- specification requirements
-
-Cite source documents and pages.
+Describe original requirements and cite source documents/pages.
 
 ==================================================
 NEW OR REVISED REQUIREMENT
 ==================================================
 
-Describe exactly what changed.
-
-Include:
-- added work
-- deleted work
-- quantity changes
-- dimensional changes
-- material changes
-- location changes
-- sequencing changes
-- schedule changes
-- responsibilities
-- testing changes
-- inspection changes
-
-Cite source documents and pages.
+Describe revised requirements and cite source documents/pages.
 
 ==================================================
 DETAILED SCOPE COMPARISON
 ==================================================
 
-For each meaningful difference use:
-
-ITEM:
-
-ORIGINAL:
-
-NEW:
-
-DIFFERENCE:
-
-POTENTIAL CONSEQUENCE:
-
-SOURCE:
-
-Clearly distinguish confirmed changes from assumptions.
+Compare original vs revised work.
 
 ==================================================
 QUANTITY AND TECHNICAL ANALYSIS
 ==================================================
 
-Perform calculations when enough information is available.
-
-Consider:
-- length
-- width
-- depth
-- thickness
-- area
-- volume
-- count
-- weight
-
-Show calculations.
-
-Do not invent missing dimensions.
-
-Clearly state assumptions.
+Perform calculations only when enough information is available.
 
 ==================================================
 POTENTIAL DIRECT COST IMPACTS
 ==================================================
 
-LABOR:
-Consider:
-- additional labor
-- crew changes
-- overtime
-- rework
-- remobilization
-- lost productivity
-
-MATERIAL:
-Consider:
-- increased quantities
-- changed materials
-- reinforcement
-- waste
-- freight
-- expedited material
-- deleted materials or credits
-
-EQUIPMENT:
-Consider:
-- additional equipment
-- larger equipment
-- longer duration
-- pumping
-- hauling
-- lifting
-- mobilization
-
-SUBCONTRACTORS / VENDORS:
-Consider impacts.
-
-Do not invent dollar values unless enough pricing information exists.
+Analyze labor, material, equipment, subcontractor, and vendor impacts.
 
 ==================================================
 POTENTIAL INDIRECT COST IMPACTS
 ==================================================
 
-Consider:
-- supervision
-- project management
-- engineering
-- general conditions
-- overhead
-- testing
-- inspections
-- permits
-- cleanup
-- documentation
-- remobilization
-- disruption
-- lost productivity
-- extended duration
-- coordination
-- procurement cancellation
-- restocking
+Analyze supervision, management, engineering, permits,
+testing, inspections, coordination, disruption, rework, and productivity.
 
 ==================================================
 SCHEDULE IMPACT
 ==================================================
 
-Consider:
-- activity duration
-- start date
-- finish date
-- critical path
-- float
-- sequencing
-- predecessors
-- successors
-- procurement
-- lead times
-- fabrication
-- inspections
-- approvals
-- submittals
-- access
-- other trades
-- rework
-
-Do not invent specific delay durations.
-
-If schedule data is missing, explain what is needed.
+Analyze sequencing, procurement, lead time, inspections,
+approvals, critical path, and rework concerns.
 
 ==================================================
 COORDINATION, CODE, AND REGIONAL REQUIREMENTS
 ==================================================
 
-COORDINATION:
+Consider structural, MEP, envelope, site, fire/life safety,
+accessibility, permitting, inspections, applicable code families,
+regional requirements, owner requirements, and company requirements.
 
-Consider:
-- structural work
-- reinforcing
-- embeds
-- MEP
-- waterproofing
-- fireproofing
-- finishes
-- excavation
-- formwork
-- grading
-- drainage
-- utilities
-- access
-- site logistics
-- adjacent trades
-- temporary work
-- inspections
-- testing
-
-CODE AND REGULATORY REVIEW:
-
-Based on project type and confirmed location, consider where relevant:
-- IBC
-- IRC
-- IEBC
-- IFC
-- NEC / NFPA 70
-- NFPA standards
-- OSHA
-- accessibility
-- energy codes
-- plumbing codes
-- mechanical codes
-- state requirements
-- local amendments
-- permits
-- inspection requirements
-- testing requirements
-- environmental regulations
-- fire marshal requirements
-- DOT requirements
-- utility requirements
-- manufacturer requirements
-
-Do not invent exact code sections.
-
-If jurisdiction is known:
-- identify it
-- identify potentially applicable code families
-- state that adopted editions must be verified
-- state that local amendments must be verified
-- identify items requiring AHJ confirmation
-
-If jurisdiction is unclear, state:
-
-"Project jurisdiction is not sufficiently identified to determine
-specific regional code requirements. Confirm the city, county,
-state, and Authority Having Jurisdiction."
-
-COMPANY / OWNER REQUIREMENTS:
-
-Review supplied documents for:
-- owner standards
-- company safety requirements
-- company QC requirements
-- specifications
-- contract exhibits
-- approved manufacturers
-- inspection procedures
-- testing procedures
-- submittal procedures
-- change-management procedures
-
-Do not invent missing requirements.
-
-CODE IMPACT ON CHANGE:
-
-Consider whether the change may require:
-- redesign
-- engineering review
-- revised calculations
-- permit revision
-- resubmittal
-- additional inspection
-- additional testing
-- structural review
-- fire/life-safety review
-- electrical review
-- mechanical review
-- plumbing review
-- environmental review
-- owner approval
-- architect approval
-- engineer approval
-
-CODE / REGULATORY CONFIDENCE:
-HIGH / MEDIUM / LOW
-
-ITEMS TO VERIFY:
+Do not invent code sections.
 
 ==================================================
 SAFETY IMPACT
 ==================================================
 
-Consider relevant risks involving:
-- excavation
-- fall protection
-- lifting
-- electrical exposure
-- hot work
-- silica
-- heavy equipment
-- temporary bracing
-- structural stability
-- traffic control
-- crane operations
-- material handling
-- scaffolding
-- trenching
-- demolition
-- PPE
-- public protection
-
-Only include relevant concerns.
+Identify relevant construction safety concerns.
 
 ==================================================
 CONTRACT AND DOCUMENTATION RISK
 ==================================================
 
-Consider:
-- written directive
-- revised drawing
-- RFI
-- field instruction
-- owner direction
-- notice requirements
-- notice deadlines
-- written authorization
-- work before pricing
-- time-and-material tracking
-- daily reports
-- photographs
-- labor records
-- equipment records
-- delivery tickets
-- purchase orders
-- invoices
-- correspondence
-- emails
-- meeting minutes
-
-If contract terms are unavailable, state:
-
-"Contract notice, authorization, and change-order requirements
-should be reviewed."
+Consider directives, RFIs, notices, authorization,
+daily reports, photos, labor records, equipment records,
+delivery tickets, emails, meeting minutes, and revision control.
 
 ==================================================
 DOCUMENT CONFLICTS OR INCONSISTENCIES
 ==================================================
 
-Identify conflicts between:
-- contract
-- scope
-- specifications
-- drawings
-- RFIs
-- revisions
-- field instructions
-- owner requirements
-- user-entered project information
-
-If none:
-NONE IDENTIFIED
+Identify conflicts between supplied documents and user-entered information.
 
 ==================================================
 MISSING INFORMATION
 ==================================================
 
-List missing information that would materially improve the analysis.
+List information needed to improve the analysis.
 
 ==================================================
 ASSUMPTIONS
@@ -1005,61 +609,30 @@ ASSUMPTIONS
 
 List assumptions.
 
-If none:
-NONE
-
 ==================================================
 SUPPORTING REFERENCES
 ==================================================
 
-For each important reference provide:
-
 DOCUMENT:
-
 PAGE:
-
 REQUIREMENT / CHANGE:
-
 WHY IT MATTERS:
 
 ==================================================
 RECOMMENDED ACTION
 ==================================================
 
-Provide practical step-by-step recommendations.
-
-Consider:
-1. Verify the revised requirement.
-2. Confirm the governing drawing set.
-3. Compare against the executed contract and scope.
-4. Review drawings and specifications.
-5. Confirm jurisdiction.
-6. Review code/regulatory requirements.
-7. Review owner/company requirements.
-8. Document directives.
-9. Quantify added/deleted work.
-10. Evaluate labor.
-11. Evaluate material.
-12. Evaluate equipment.
-13. Evaluate schedule.
-14. Evaluate other trades.
-15. Evaluate inspection/testing.
-16. Review notice requirements.
-17. Preserve records.
-18. Prepare pricing/change documentation.
-19. Obtain required authorization.
-20. Track actual impacts.
+Give practical step-by-step recommendations.
 
 ==================================================
 RISK FLAGS
 ==================================================
 
 RED:
-Serious commercial, contractual, safety,
-code, or schedule concern.
+Serious concern.
 
 YELLOW:
-Requires review or additional information.
+Requires review.
 
 GREEN:
 No major issue identified.
@@ -1068,22 +641,9 @@ No major issue identified.
 FINAL ASSESSMENT
 ==================================================
 
-Give a professional conclusion explaining:
-- whether this appears to be a potential scope change
-- why
-- major cost risk
-- major schedule risk
-- major coordination risk
-- major code/regulatory concern
-- major documentation concern
-- next action
+Provide a professional construction-management conclusion.
 
-End with:
-
-"This analysis is a preliminary construction-management review
-and is not a substitute for review by the project manager,
-estimator, superintendent, design professional, Authority Having
-Jurisdiction, or legal counsel where appropriate."
+Do not provide legal advice.
 """
 
 
@@ -1101,9 +661,8 @@ st.title("🏗️ Construction Scope AI")
 
 st.write(
     "Upload original and revised construction documents. "
-    "The system will analyze document text and can visually inspect "
-    "plan sheets for scope, cost, schedule, code, safety, "
-    "coordination, and documentation impacts."
+    "The system analyzes scope, drawings, cost, schedule, "
+    "coordination, code, safety, and documentation impacts."
 )
 
 st.warning(
@@ -1112,15 +671,11 @@ st.warning(
 )
 
 
-# ==========================================================
 # PROJECT INFO
-# ==========================================================
 
 st.header("Project Information")
 
-project_name = st.text_input(
-    "Project Name"
-)
+project_name = st.text_input("Project Name")
 
 project_location = st.text_input(
     "Project Location",
@@ -1132,9 +687,7 @@ company_name = st.text_input(
 )
 
 
-# ==========================================================
 # DRAWING SETTINGS
-# ==========================================================
 
 st.header("Drawing Analysis Settings")
 
@@ -1156,9 +709,7 @@ st.caption(
 )
 
 
-# ==========================================================
 # ORIGINAL DOCUMENTS
-# ==========================================================
 
 st.header("Original Project Documents")
 
@@ -1170,9 +721,7 @@ original_files = st.file_uploader(
 )
 
 
-# ==========================================================
 # REVISED DOCUMENTS
-# ==========================================================
 
 st.header("New / Revised Project Documents")
 
@@ -1184,9 +733,7 @@ new_files = st.file_uploader(
 )
 
 
-# ==========================================================
 # RUN ANALYSIS
-# ==========================================================
 
 if st.button(
     "Analyze Project",
@@ -1249,33 +796,23 @@ PROJECT LOCATION PROVIDED BY USER:
 CONTRACTOR / COMPANY:
 {company_name}
 
-
 ORIGINAL DOCUMENT TEXT:
 
 {original_text}
-
 
 REVISED DOCUMENT TEXT:
 
 {revised_text}
 
-
 Perform a detailed construction-management analysis.
 
-Use the supplied documents as the primary source of confirmed facts.
-
-Use visual drawing evidence when images are supplied.
+Use supplied documents as the primary source of confirmed facts.
 
 Clearly distinguish:
 - confirmed facts
 - assumptions
 - missing information
 - items requiring verification
-
-If user-entered project information conflicts with the documents,
-identify the conflict clearly.
-
-Do not invent requirements.
 """
 
                 content = [
@@ -1356,9 +893,7 @@ Do not invent requirements.
                 st.code(str(error))
 
 
-# ==========================================================
 # RESULTS
-# ==========================================================
 
 if "analysis" in st.session_state:
 
