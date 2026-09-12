@@ -1,0 +1,5 @@
+streamlit
+openai
+pypdf
+python-dotenv
+reportlab
