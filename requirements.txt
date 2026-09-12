@@ -3,3 +3,4 @@ openai
 pypdf
 python-dotenv
 reportlab
+PyMuPDF
