@@ -38,7 +38,356 @@ from reportlab.platypus.tableofcontents import TableOfContents
 st.set_page_config(
     page_title="Construction Scope AI",
     page_icon="🏗️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+
+# ==========================================================
+# WEBSITE STYLING
+# ==========================================================
+
+st.markdown(
+    """
+    <style>
+
+    /* =====================================================
+       GLOBAL
+    ===================================================== */
+
+    [data-testid="stAppViewContainer"] {
+        background: #f5f7fa;
+    }
+
+    [data-testid="stHeader"] {
+        background: rgba(255,255,255,0);
+    }
+
+    .block-container {
+        max-width: 1180px;
+        padding-top: 1.2rem;
+        padding-bottom: 4rem;
+    }
+
+    html, body, [class*="css"] {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                     Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    h1, h2, h3 {
+        color: #101828;
+        letter-spacing: -0.02em;
+    }
+
+
+    /* =====================================================
+       TOP NAV
+    ===================================================== */
+
+    .top-nav {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 14px;
+        padding: 14px 20px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+    }
+
+    .brand-wrap {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .brand-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: #175cd3;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .brand-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #101828;
+        margin: 0;
+    }
+
+    .brand-sub {
+        font-size: 11px;
+        color: #667085;
+        margin-top: 1px;
+    }
+
+    .nav-badge {
+        background: #eff4ff;
+        color: #175cd3;
+        border: 1px solid #d1e0ff;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .hero {
+        background:
+            linear-gradient(135deg, #101828 0%, #1d2939 60%, #344054 100%);
+        border-radius: 20px;
+        padding: 42px 44px;
+        margin-bottom: 22px;
+        box-shadow: 0 12px 32px rgba(16,24,40,0.12);
+    }
+
+    .hero-eyebrow {
+        display: inline-block;
+        background: rgba(255,255,255,0.09);
+        border: 1px solid rgba(255,255,255,0.13);
+        border-radius: 999px;
+        padding: 6px 11px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #d1e9ff;
+        margin-bottom: 16px;
+    }
+
+    .hero h1 {
+        color: #ffffff !important;
+        font-size: 38px;
+        line-height: 1.1;
+        margin: 0 0 14px 0;
+        max-width: 760px;
+    }
+
+    .hero p {
+        color: #d0d5dd;
+        font-size: 17px;
+        line-height: 1.6;
+        max-width: 820px;
+        margin: 0;
+    }
+
+    .hero-highlight {
+        color: #84adff;
+        font-weight: 600;
+    }
+
+
+    /* =====================================================
+       FEATURE CARDS
+    ===================================================== */
+
+    .feature-card {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 14px;
+        padding: 18px;
+        min-height: 135px;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+    }
+
+    .feature-icon {
+        font-size: 22px;
+        margin-bottom: 8px;
+    }
+
+    .feature-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #101828;
+        margin-bottom: 5px;
+    }
+
+    .feature-text {
+        font-size: 12.5px;
+        color: #667085;
+        line-height: 1.45;
+    }
+
+
+    /* =====================================================
+       SECTION LABEL
+    ===================================================== */
+
+    .section-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #175cd3;
+        margin-bottom: 5px;
+    }
+
+    .section-title {
+        font-size: 23px;
+        font-weight: 700;
+        color: #101828;
+        margin-bottom: 4px;
+    }
+
+    .section-description {
+        font-size: 14px;
+        color: #667085;
+        margin-bottom: 18px;
+    }
+
+
+    /* =====================================================
+       NATIVE STREAMLIT CONTAINERS
+    ===================================================== */
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background: #ffffff;
+        border: 1px solid #e4e7ec !important;
+        border-radius: 14px !important;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+    }
+
+
+    /* =====================================================
+       INPUTS
+    ===================================================== */
+
+    div[data-baseweb="input"] {
+        border-radius: 9px;
+    }
+
+    div[data-testid="stTextInput"] input {
+        border-radius: 9px;
+        min-height: 44px;
+    }
+
+    div[data-testid="stNumberInput"] input {
+        border-radius: 9px;
+    }
+
+
+    /* =====================================================
+       FILE UPLOADERS
+    ===================================================== */
+
+    div[data-testid="stFileUploader"] {
+        background: #fafbfc;
+        border-radius: 12px;
+    }
+
+    div[data-testid="stFileUploaderDropzone"] {
+        border: 1.5px dashed #b8c2d1;
+        border-radius: 12px;
+        background: #f9fafb;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+
+    div[data-testid="stFileUploaderDropzone"]:hover {
+        border-color: #175cd3;
+        background: #f5f8ff;
+    }
+
+
+    /* =====================================================
+       BUTTONS
+    ===================================================== */
+
+    .stButton > button {
+        min-height: 50px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+        border: none;
+        transition: all .18s ease;
+    }
+
+    .stButton > button[kind="primary"] {
+        background: #175cd3;
+        color: white;
+    }
+
+    .stButton > button[kind="primary"]:hover {
+        background: #1849a9;
+        box-shadow: 0 5px 14px rgba(23,92,211,0.22);
+        transform: translateY(-1px);
+    }
+
+    div[data-testid="stDownloadButton"] button {
+        min-height: 48px;
+        border-radius: 10px;
+        font-weight: 650;
+    }
+
+
+    /* =====================================================
+       METRICS
+    ===================================================== */
+
+    div[data-testid="stMetric"] {
+        background: #ffffff;
+        border: 1px solid #e4e7ec;
+        border-radius: 12px;
+        padding: 16px 18px;
+        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
+    }
+
+    div[data-testid="stMetricLabel"] {
+        font-size: 12px;
+        color: #667085;
+        font-weight: 600;
+    }
+
+    div[data-testid="stMetricValue"] {
+        font-size: 23px;
+        color: #101828;
+        font-weight: 700;
+    }
+
+
+    /* =====================================================
+       TABS
+    ===================================================== */
+
+    button[data-baseweb="tab"] {
+        font-weight: 600;
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       INFO BOXES
+    ===================================================== */
+
+    div[data-testid="stAlert"] {
+        border-radius: 12px;
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
+
+    .site-footer {
+        margin-top: 45px;
+        padding-top: 18px;
+        border-top: 1px solid #e4e7ec;
+        color: #98a2b3;
+        text-align: center;
+        font-size: 11px;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
 
@@ -133,7 +482,7 @@ SUBSECTIONS = [
 
 
 # ==========================================================
-# EXTRACT PDF TEXT
+# PDF TEXT
 # ==========================================================
 
 def extract_pdf_text(uploaded_file):
@@ -143,10 +492,7 @@ def extract_pdf_text(uploaded_file):
 
     text = ""
 
-    for page_number, page in enumerate(
-        reader.pages,
-        start=1
-    ):
+    for page_number, page in enumerate(reader.pages, start=1):
 
         page_text = page.extract_text() or ""
 
@@ -161,13 +507,10 @@ def extract_pdf_text(uploaded_file):
 
 
 # ==========================================================
-# PDF PAGES TO IMAGES
+# PDF IMAGES
 # ==========================================================
 
-def pdf_pages_to_images(
-    uploaded_file,
-    max_pages
-):
+def pdf_pages_to_images(uploaded_file, max_pages):
 
     pdf_bytes = uploaded_file.getvalue()
 
@@ -192,19 +535,15 @@ def pdf_pages_to_images(
             alpha=False
         )
 
-        image_bytes = pix.tobytes("png")
-
         encoded = base64.b64encode(
-            image_bytes
+            pix.tobytes("png")
         ).decode("utf-8")
 
         images.append(
             {
                 "document": uploaded_file.name,
                 "page": page_index + 1,
-                "image_url": (
-                    f"data:image/png;base64,{encoded}"
-                )
+                "image_url": f"data:image/png;base64,{encoded}"
             }
         )
 
@@ -227,10 +566,7 @@ def clean_heading(text):
         text
     )
 
-    text = text.replace(
-        "**",
-        ""
-    )
+    text = text.replace("**", "")
 
     return text.strip()
 
@@ -255,10 +591,6 @@ def format_inline_markdown(text):
     return text
 
 
-# ==========================================================
-# SECTION EXTRACTION
-# ==========================================================
-
 def split_sections(analysis_text):
 
     sections = {}
@@ -272,29 +604,30 @@ def split_sections(analysis_text):
         if upper in MAIN_SECTIONS:
 
             current_section = upper
-
-            sections[current_section] = [
-                upper
-            ]
-
+            sections[current_section] = [upper]
             continue
 
         if current_section:
-
-            sections[current_section].append(
-                line
-            )
+            sections[current_section].append(line)
 
     return sections
 
 
-def build_quick_report_text(
-    analysis_text
-):
+def section_text(analysis_text, section_name):
 
-    sections = split_sections(
-        analysis_text
+    sections = split_sections(analysis_text)
+
+    lines = sections.get(
+        section_name,
+        []
     )
+
+    return "\n".join(lines)
+
+
+def build_quick_report_text(analysis_text):
+
+    sections = split_sections(analysis_text)
 
     selected = []
 
@@ -310,10 +643,6 @@ def build_quick_report_text(
 
     return "\n".join(selected)
 
-
-# ==========================================================
-# EXECUTIVE SUMMARY FIELD EXTRACTION
-# ==========================================================
 
 def extract_field(
     analysis_text,
@@ -345,18 +674,14 @@ def extract_field(
     return default
 
 
-def count_change_register_items(
-    analysis_text
-):
+def count_change_register_items(analysis_text):
 
     matches = re.findall(
         r"\bCR-\d+\b",
         analysis_text
     )
 
-    return len(
-        set(matches)
-    )
+    return len(set(matches))
 
 
 def count_risk_flags(
@@ -405,7 +730,7 @@ def count_risk_flags(
 
 
 # ==========================================================
-# MARKDOWN TABLE HELPERS
+# MARKDOWN TABLES
 # ==========================================================
 
 def looks_like_table_row(line):
@@ -442,8 +767,7 @@ def parse_markdown_table(lines):
 
         cells = [
             cell.strip()
-            for cell in
-            line.strip("|").split("|")
+            for cell in line.strip("|").split("|")
         ]
 
         if cells:
@@ -456,9 +780,7 @@ def parse_markdown_table(lines):
 # PDF TEMPLATE
 # ==========================================================
 
-class ConstructionReportTemplate(
-    BaseDocTemplate
-):
+class ConstructionReportTemplate(BaseDocTemplate):
 
     def __init__(
         self,
@@ -505,21 +827,17 @@ class ConstructionReportTemplate(
             id="report"
         )
 
-        cover_template = PageTemplate(
-            id="cover",
-            frames=[cover_frame]
-        )
-
-        report_template = PageTemplate(
-            id="report",
-            frames=[report_frame],
-            onPage=self.draw_header_footer
-        )
-
         self.addPageTemplates(
             [
-                cover_template,
-                report_template
+                PageTemplate(
+                    id="cover",
+                    frames=[cover_frame]
+                ),
+                PageTemplate(
+                    id="report",
+                    frames=[report_frame],
+                    onPage=self.draw_header_footer
+                ),
             ]
         )
 
@@ -532,7 +850,6 @@ class ConstructionReportTemplate(
 
         canvas.saveState()
 
-        # HEADER
         canvas.setStrokeColor(
             colors.HexColor("#D0D5DD")
         )
@@ -572,7 +889,6 @@ class ConstructionReportTemplate(
             "Construction Scope AI Analysis"
         )
 
-        # FOOTER
         canvas.setStrokeColor(
             colors.HexColor("#D0D5DD")
         )
@@ -621,10 +937,7 @@ class ConstructionReportTemplate(
         ):
             return
 
-        if (
-            flowable.style.name
-            != "SectionHeading"
-        ):
+        if flowable.style.name != "SectionHeading":
             return
 
         text = flowable.getPlainText()
@@ -641,9 +954,7 @@ class ConstructionReportTemplate(
             )
         )
 
-        self.canv.bookmarkPage(
-            key
-        )
+        self.canv.bookmarkPage(key)
 
         self.canv.addOutlineEntry(
             text,
@@ -664,23 +975,19 @@ class ConstructionReportTemplate(
 
 
 # ==========================================================
-# TABLE WIDTH RATIOS
+# TABLE WIDTHS
 # ==========================================================
 
-def table_width_ratios(
-    header_row
-):
+def table_width_ratios(header_row):
 
     normalized = [
         cell.lower().strip()
         for cell in header_row
     ]
 
-    # CHANGE REGISTER
     if (
         len(normalized) == 7
         and normalized[0] == "id"
-        and "change" in normalized[1]
     ):
 
         return [
@@ -693,7 +1000,6 @@ def table_width_ratios(
             0.12,
         ]
 
-    # DETAILED SCOPE COMPARISON
     if (
         len(normalized) == 5
         and "scope area" in normalized[0]
@@ -707,7 +1013,6 @@ def table_width_ratios(
             0.13,
         ]
 
-    # QUANTITY TABLE
     if (
         len(normalized) == 4
         and normalized[0] == "item"
@@ -720,7 +1025,6 @@ def table_width_ratios(
             0.22,
         ]
 
-    # REFERENCES TABLE
     if (
         len(normalized) == 4
         and normalized[0] == "document"
@@ -737,7 +1041,7 @@ def table_width_ratios(
 
 
 # ==========================================================
-# CREATE PROFESSIONAL TABLE
+# CREATE PDF TABLE
 # ==========================================================
 
 def create_report_table(
@@ -758,37 +1062,25 @@ def create_report_table(
 
     for row in rows:
 
-        padded = (
+        normalized_rows.append(
             row
             + [""] * (
-                max_columns
-                - len(row)
+                max_columns - len(row)
             )
-        )
-
-        normalized_rows.append(
-            padded
         )
 
     formatted_rows = []
 
     for row in normalized_rows:
 
-        formatted_row = []
-
-        for cell in row:
-
-            formatted_row.append(
+        formatted_rows.append(
+            [
                 Paragraph(
-                    format_inline_markdown(
-                        cell
-                    ),
+                    format_inline_markdown(cell),
                     cell_style
                 )
-            )
-
-        formatted_rows.append(
-            formatted_row
+                for cell in row
+            ]
         )
 
     ratios = table_width_ratios(
@@ -805,8 +1097,7 @@ def create_report_table(
     else:
 
         col_widths = [
-            available_width
-            / max_columns
+            available_width / max_columns
         ] * max_columns
 
     table = Table(
@@ -825,28 +1116,24 @@ def create_report_table(
                     (-1, 0),
                     colors.HexColor("#344054")
                 ),
-
                 (
                     "TEXTCOLOR",
                     (0, 0),
                     (-1, 0),
                     colors.white
                 ),
-
                 (
                     "FONTNAME",
                     (0, 0),
                     (-1, 0),
                     "Helvetica-Bold"
                 ),
-
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "TOP"
                 ),
-
                 (
                     "GRID",
                     (0, 0),
@@ -854,35 +1141,30 @@ def create_report_table(
                     0.35,
                     colors.HexColor("#D0D5DD")
                 ),
-
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
-
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
-
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
-
                 (
                     "BOTTOMPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
-
                 (
                     "ROWBACKGROUNDS",
                     (0, 1),
@@ -900,7 +1182,7 @@ def create_report_table(
 
 
 # ==========================================================
-# EXECUTIVE DASHBOARD
+# PDF DASHBOARD
 # ==========================================================
 
 def build_dashboard(
@@ -1020,7 +1302,6 @@ def build_dashboard(
                     (-1, -1),
                     colors.HexColor("#F9FAFB")
                 ),
-
                 (
                     "GRID",
                     (0, 0),
@@ -1028,35 +1309,30 @@ def build_dashboard(
                     0.5,
                     colors.HexColor("#D0D5DD")
                 ),
-
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "MIDDLE"
                 ),
-
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
-
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
-
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
-
                 (
                     "BOTTOMPADDING",
                     (0, 0),
@@ -1071,7 +1347,7 @@ def build_dashboard(
 
 
 # ==========================================================
-# BUILD PDF
+# CREATE PDF
 # ==========================================================
 
 def create_pdf_report(
@@ -1082,15 +1358,11 @@ def create_pdf_report(
     quick_mode=False
 ):
 
-    if quick_mode:
-
-        report_text = build_quick_report_text(
-            analysis_text
-        )
-
-    else:
-
-        report_text = analysis_text
+    report_text = (
+        build_quick_report_text(analysis_text)
+        if quick_mode
+        else analysis_text
+    )
 
     buffer = BytesIO()
 
@@ -1101,11 +1373,6 @@ def create_pdf_report(
     )
 
     styles = getSampleStyleSheet()
-
-
-    # ======================================================
-    # STYLES
-    # ======================================================
 
     cover_title = ParagraphStyle(
         "CoverTitle",
@@ -1264,30 +1531,17 @@ def create_pdf_report(
         textColor=colors.HexColor("#667085")
     )
 
-
     story = []
 
-
-    # ======================================================
     # COVER
-    # ======================================================
-
-    story.append(
-        Spacer(
-            1,
-            1.2 * inch
-        )
-    )
+    story.append(Spacer(1, 1.2 * inch))
 
     story.append(
         Paragraph(
             (
-                "Construction Scope AI "
-                + (
-                    "Quick Report"
-                    if quick_mode
-                    else "Analysis"
-                )
+                "Construction Scope AI Quick Report"
+                if quick_mode
+                else "Construction Scope AI Analysis"
             ),
             cover_title
         )
@@ -1295,15 +1549,12 @@ def create_pdf_report(
 
     story.append(
         Paragraph(
-            project_name
-            if project_name
-            else "Construction Project",
+            project_name or "Construction Project",
             cover_project
         )
     )
 
     if project_location:
-
         story.append(
             Paragraph(
                 project_location,
@@ -1312,7 +1563,6 @@ def create_pdf_report(
         )
 
     if company_name:
-
         story.append(
             Paragraph(
                 company_name,
@@ -1351,28 +1601,20 @@ def create_pdf_report(
 
     story.append(
         Paragraph(
-            datetime.now().strftime(
-                "%B %d, %Y"
-            ),
+            datetime.now().strftime("%B %d, %Y"),
             cover_detail
         )
     )
 
     story.append(
-        NextPageTemplate(
-            "report"
-        )
+        NextPageTemplate("report")
     )
 
     story.append(
         PageBreak()
     )
 
-
-    # ======================================================
     # EXECUTIVE DASHBOARD
-    # ======================================================
-
     story.append(
         Paragraph(
             "Executive Dashboard",
@@ -1396,11 +1638,7 @@ def create_pdf_report(
         )
     )
 
-
-    # ======================================================
-    # FULL REPORT GETS TOC
-    # ======================================================
-
+    # FULL REPORT TOC
     if not quick_mode:
 
         story.append(
@@ -1429,21 +1667,11 @@ def create_pdf_report(
             )
         ]
 
-        story.append(
-            toc
-        )
+        story.append(toc)
+        story.append(PageBreak())
 
-        story.append(
-            PageBreak()
-        )
-
-
-    # ======================================================
-    # REPORT BODY
-    # ======================================================
-
+    # BODY
     lines = report_text.splitlines()
-
     index = 0
 
     while index < len(lines):
@@ -1464,21 +1692,13 @@ def create_pdf_report(
 
         if (
             clean.startswith("====")
-            or clean in [
-                "---",
-                "***",
-                "___"
-            ]
+            or clean in ["---", "***", "___"]
         ):
 
             index += 1
             continue
 
-
-        # TABLE
-        if looks_like_table_row(
-            clean
-        ):
+        if looks_like_table_row(clean):
 
             table_lines = []
 
@@ -1514,9 +1734,7 @@ def create_pdf_report(
                     )
                 )
 
-                story.append(
-                    table
-                )
+                story.append(table)
 
                 story.append(
                     Spacer(
@@ -1527,17 +1745,9 @@ def create_pdf_report(
 
             continue
 
+        heading_text = clean_heading(clean)
+        heading_upper = heading_text.upper()
 
-        heading_text = clean_heading(
-            clean
-        )
-
-        heading_upper = (
-            heading_text.upper()
-        )
-
-
-        # MAIN SECTION
         if heading_upper in MAIN_SECTIONS:
 
             story.append(
@@ -1550,8 +1760,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # SUBSECTION
         if heading_upper in SUBSECTIONS:
 
             story.append(
@@ -1564,8 +1772,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # CHANGE HEADING
         if re.match(
             r"(?i)^change\s+\d+",
             heading_text
@@ -1583,8 +1789,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # MARKDOWN SUBHEADING
         if (
             clean.startswith("## ")
             or clean.startswith("### ")
@@ -1602,8 +1806,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # BULLET
         if (
             clean.startswith("• ")
             or clean.startswith("- ")
@@ -1622,8 +1824,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # NUMBERED LIST
         number_match = re.match(
             r"^(\d+)\.\s+(.*)",
             clean
@@ -1631,19 +1831,11 @@ def create_pdf_report(
 
         if number_match:
 
-            number = (
-                number_match.group(1)
-            )
-
-            text = (
-                number_match.group(2)
-            )
-
             story.append(
                 Paragraph(
-                    f"<b>{number}.</b> "
+                    f"<b>{number_match.group(1)}.</b> "
                     + format_inline_markdown(
-                        text
+                        number_match.group(2)
                     ),
                     numbered_style
                 )
@@ -1652,8 +1844,6 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # KEY VALUE
         label_match = re.match(
             r"^\*{0,2}"
             r"([A-Za-z0-9 /&()'’\-]+)"
@@ -1663,23 +1853,12 @@ def create_pdf_report(
 
         if label_match:
 
-            label = (
-                label_match
-                .group(1)
-                .strip()
-            )
-
-            value = (
-                label_match
-                .group(2)
-                .strip()
-            )
+            label = label_match.group(1).strip()
+            value = label_match.group(2).strip()
 
             formatted = (
                 "<b>"
-                + format_inline_markdown(
-                    label
-                )
+                + format_inline_markdown(label)
                 + ":</b>"
             )
 
@@ -1687,9 +1866,7 @@ def create_pdf_report(
 
                 formatted += (
                     " "
-                    + format_inline_markdown(
-                        value
-                    )
+                    + format_inline_markdown(value)
                 )
 
             story.append(
@@ -1702,23 +1879,14 @@ def create_pdf_report(
             index += 1
             continue
 
-
-        # NORMAL TEXT
         story.append(
             Paragraph(
-                format_inline_markdown(
-                    clean
-                ),
+                format_inline_markdown(clean),
                 body_style
             )
         )
 
         index += 1
-
-
-    # ======================================================
-    # DISCLAIMER
-    # ======================================================
 
     story.append(
         Spacer(
@@ -1740,9 +1908,7 @@ def create_pdf_report(
         )
     )
 
-    document.multiBuild(
-        story
-    )
+    document.multiBuild(story)
 
     buffer.seek(0)
 
@@ -2124,128 +2290,297 @@ and recommended next action.
 
 
 # ==========================================================
-# WEBSITE
+# TOP NAVIGATION
 # ==========================================================
 
-st.title(
-    "🏗️ Construction Scope AI"
-)
-
-st.write(
-    "Compare original and revised construction documents "
-    "to identify meaningful changes, affected trades, "
-    "cost risk, schedule risk, coordination issues, "
-    "and documentation concerns."
-)
-
-st.info(
-    "Preliminary construction-management analysis only. "
-    "Important findings should be verified against current "
-    "project documents and qualified project personnel."
+st.markdown(
+    """
+    <div class="top-nav">
+        <div class="brand-wrap">
+            <div class="brand-icon">🏗️</div>
+            <div>
+                <div class="brand-name">Construction Scope AI</div>
+                <div class="brand-sub">
+                    Construction change intelligence
+                </div>
+            </div>
+        </div>
+        <div class="nav-badge">Early Access</div>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 
 # ==========================================================
-# PROJECT INFORMATION
+# HERO
 # ==========================================================
 
-st.header(
-    "1. Project Information"
+st.markdown(
+    """
+    <div class="hero">
+        <div class="hero-eyebrow">
+            AI-POWERED CHANGE MANAGEMENT
+        </div>
+
+        <h1>
+            Turn drawing revisions into
+            construction decisions.
+        </h1>
+
+        <p>
+            Compare original and revised project documents to identify
+            <span class="hero-highlight">scope changes</span>,
+            affected trades, cost exposure, schedule risk,
+            coordination issues, and recommended next actions.
+        </p>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-left, right = st.columns(2)
 
-with left:
+# ==========================================================
+# FEATURE STRIP
+# ==========================================================
 
-    project_name = st.text_input(
-        "Project Name"
+feature1, feature2, feature3 = st.columns(3)
+
+with feature1:
+
+    st.markdown(
+        """
+        <div class="feature-card">
+            <div class="feature-icon">🔎</div>
+            <div class="feature-title">Find Meaningful Changes</div>
+            <div class="feature-text">
+                Compare baseline and revised documents while filtering
+                out irrelevant drafting differences.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
-    company_name = st.text_input(
-        "Contractor / Company"
+with feature2:
+
+    st.markdown(
+        """
+        <div class="feature-card">
+            <div class="feature-icon">⚠️</div>
+            <div class="feature-title">Understand Project Risk</div>
+            <div class="feature-text">
+                Identify potential cost, schedule, coordination,
+                documentation, and regulatory exposure.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
 
-with right:
+with feature3:
 
-    project_location = st.text_input(
-        "Project Location",
-        placeholder="Example: Johnson City, Tennessee"
+    st.markdown(
+        """
+        <div class="feature-card">
+            <div class="feature-icon">📄</div>
+            <div class="feature-title">Create Actionable Reports</div>
+            <div class="feature-text">
+                Generate management-ready quick reports and detailed
+                supporting analysis.
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
     )
+
+
+st.write("")
 
 
 # ==========================================================
-# DOCUMENT UPLOAD
+# STEP 1
 # ==========================================================
 
-st.header(
-    "2. Project Documents"
+st.markdown(
+    """
+    <div class="section-label">Step 1</div>
+    <div class="section-title">Set up your project</div>
+    <div class="section-description">
+        Add basic project information that will appear in the analysis
+        and generated reports.
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
-original_col, revised_col = st.columns(2)
+with st.container(border=True):
 
-with original_col:
+    left, right = st.columns(2)
 
-    st.subheader(
-        "Original / Baseline"
-    )
+    with left:
 
-    original_files = st.file_uploader(
-        "Upload original drawings, contracts, scopes, specifications, etc.",
-        type=["pdf"],
-        accept_multiple_files=True,
-        key="original"
-    )
+        project_name = st.text_input(
+            "Project Name",
+            placeholder="Example: Building A Renovation"
+        )
 
-with revised_col:
+        company_name = st.text_input(
+            "Contractor / Company",
+            placeholder="Example: ABC Construction"
+        )
 
-    st.subheader(
-        "New / Revised"
-    )
+    with right:
 
-    revised_files = st.file_uploader(
-        "Upload revised drawings, RFIs, bulletins, directives, etc.",
-        type=["pdf"],
-        accept_multiple_files=True,
-        key="revised"
+        project_location = st.text_input(
+            "Project Location",
+            placeholder="Example: Johnson City, Tennessee"
+        )
+
+        project_reference = st.text_input(
+            "Project Number / Reference",
+            placeholder="Optional"
+        )
+
+
+st.write("")
+
+
+# ==========================================================
+# STEP 2
+# ==========================================================
+
+st.markdown(
+    """
+    <div class="section-label">Step 2</div>
+    <div class="section-title">Upload project documents</div>
+    <div class="section-description">
+        Add the baseline documents on the left and the newer or revised
+        documents on the right.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+upload_left, upload_right = st.columns(2)
+
+with upload_left:
+
+    with st.container(border=True):
+
+        st.markdown("### Original / Baseline")
+
+        st.caption(
+            "Contract drawings, original scopes, specifications, "
+            "or previously approved documents."
+        )
+
+        original_files = st.file_uploader(
+            "Upload baseline PDFs",
+            type=["pdf"],
+            accept_multiple_files=True,
+            key="original"
+        )
+
+        if original_files:
+
+            st.success(
+                f"{len(original_files)} baseline "
+                f"document(s) ready"
+            )
+
+with upload_right:
+
+    with st.container(border=True):
+
+        st.markdown("### New / Revised")
+
+        st.caption(
+            "Revised drawings, bulletins, RFIs, directives, "
+            "or newly issued project documents."
+        )
+
+        revised_files = st.file_uploader(
+            "Upload revised PDFs",
+            type=["pdf"],
+            accept_multiple_files=True,
+            key="revised"
+        )
+
+        if revised_files:
+
+            st.success(
+                f"{len(revised_files)} revised "
+                f"document(s) ready"
+            )
+
+
+st.write("")
+
+
+# ==========================================================
+# STEP 3
+# ==========================================================
+
+st.markdown(
+    """
+    <div class="section-label">Step 3</div>
+    <div class="section-title">Run the analysis</div>
+    <div class="section-description">
+        Choose how much visual drawing review you want and start the
+        comparison.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+with st.container(border=True):
+
+    settings_left, settings_right = st.columns([1.3, 1])
+
+    with settings_left:
+
+        visual_analysis = st.checkbox(
+            "Visually analyze plan sheets",
+            value=True,
+            help=(
+                "Allows the AI to inspect rendered drawing pages "
+                "in addition to extracted PDF text."
+            )
+        )
+
+        st.caption(
+            "Recommended for architectural, structural, MEP, "
+            "and other graphical plan sets."
+        )
+
+    with settings_right:
+
+        max_pages = st.number_input(
+            "Pages visually reviewed per PDF",
+            min_value=1,
+            max_value=20,
+            value=6
+        )
+
+        st.caption(
+            "Use 3–6 pages while testing to control processing cost."
+        )
+
+    st.write("")
+
+    analyze_clicked = st.button(
+        "Analyze Project →",
+        type="primary",
+        use_container_width=True
     )
 
 
 # ==========================================================
-# SETTINGS
+# ANALYSIS
 # ==========================================================
 
-st.header(
-    "3. Analysis Settings"
-)
-
-visual_analysis = st.checkbox(
-    "Visually analyze plan sheets",
-    value=True
-)
-
-max_pages = st.number_input(
-    "Maximum drawing pages visually analyzed per PDF",
-    min_value=1,
-    max_value=20,
-    value=6
-)
-
-st.caption(
-    "For testing, 3–6 pages per PDF is recommended."
-)
-
-
-# ==========================================================
-# ANALYZE
-# ==========================================================
-
-st.divider()
-
-if st.button(
-    "Analyze Project",
-    type="primary",
-    use_container_width=True
-):
+if analyze_clicked:
 
     if not original_files:
 
@@ -2262,7 +2597,8 @@ if st.button(
     else:
 
         with st.spinner(
-            "Reviewing project documents and drawing revisions..."
+            "Reviewing documents, comparing revisions, "
+            "and building the project risk analysis..."
         ):
 
             try:
@@ -2274,12 +2610,11 @@ if st.button(
                 revised_images = []
 
 
+                # ORIGINAL DOCUMENTS
                 for file in original_files:
 
                     original_text += (
-                        extract_pdf_text(
-                            file
-                        )
+                        extract_pdf_text(file)
                     )
 
                     if visual_analysis:
@@ -2292,12 +2627,11 @@ if st.button(
                         )
 
 
+                # REVISED DOCUMENTS
                 for file in revised_files:
 
                     revised_text += (
-                        extract_pdf_text(
-                            file
-                        )
+                        extract_pdf_text(file)
                     )
 
                     if visual_analysis:
@@ -2315,6 +2649,9 @@ PROJECT INFORMATION PROVIDED BY USER
 
 Project Name:
 {project_name}
+
+Project Number / Reference:
+{project_reference}
 
 Project Location:
 {project_location}
@@ -2339,10 +2676,10 @@ NEW / REVISED DOCUMENT TEXT
 
 Compare these documents using the required report structure.
 
-Use supplied documents as the primary evidence.
+Use supplied project documents as the primary evidence.
 
-If user-entered information conflicts with the project
-documents, report the conflict.
+If user-entered information conflicts with the project documents,
+report the conflict rather than silently resolving it.
 
 Prioritize meaningful construction changes over cosmetic
 or drafting differences.
@@ -2415,34 +2752,24 @@ or drafting differences.
                     ]
                 )
 
+
                 analysis = response.output_text
 
 
-                st.session_state[
-                    "analysis"
-                ] = analysis
-
-                st.session_state[
-                    "project_name"
-                ] = project_name
-
-                st.session_state[
-                    "project_location"
-                ] = project_location
-
-                st.session_state[
-                    "company_name"
-                ] = company_name
-
+                st.session_state["analysis"] = analysis
+                st.session_state["project_name"] = project_name
+                st.session_state["project_location"] = project_location
+                st.session_state["company_name"] = company_name
+                st.session_state["project_reference"] = project_reference
 
                 st.success(
-                    "Project analysis complete."
+                    "Analysis complete. Review the results below."
                 )
 
             except Exception as error:
 
                 st.error(
-                    "The analysis could not be completed."
+                    "The project analysis could not be completed."
                 )
 
                 st.code(
@@ -2456,20 +2783,198 @@ or drafting differences.
 
 if "analysis" in st.session_state:
 
-    st.divider()
+    analysis = st.session_state["analysis"]
 
-    st.header(
-        "4. Project Analysis"
-    )
-
-    analysis = st.session_state[
-        "analysis"
-    ]
+    st.write("")
+    st.write("")
 
     st.markdown(
+        """
+        <div class="section-label">Analysis Complete</div>
+        <div class="section-title">Project Intelligence Dashboard</div>
+        <div class="section-description">
+            Review the highest-priority findings before opening the
+            detailed project analysis.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+    # ======================================================
+    # DASHBOARD METRICS
+    # ======================================================
+
+    scope_change = extract_field(
+        analysis,
+        "POTENTIAL SCOPE CHANGE"
+    )
+
+    severity = extract_field(
+        analysis,
+        "SEVERITY"
+    )
+
+    confidence = extract_field(
+        analysis,
+        "CONFIDENCE"
+    )
+
+    review_status = extract_field(
+        analysis,
+        "REVIEW BEFORE PROCEEDING"
+    )
+
+    changes_found = count_change_register_items(
         analysis
     )
 
+    red_flags = count_risk_flags(
+        analysis,
+        "RED"
+    )
+
+
+    metric1, metric2, metric3, metric4 = st.columns(4)
+
+    with metric1:
+
+        st.metric(
+            "Scope Change",
+            scope_change
+        )
+
+    with metric2:
+
+        st.metric(
+            "Overall Severity",
+            severity
+        )
+
+    with metric3:
+
+        st.metric(
+            "Changes Found",
+            changes_found
+        )
+
+    with metric4:
+
+        st.metric(
+            "Red Flags",
+            red_flags
+        )
+
+
+    st.write("")
+
+
+    # ======================================================
+    # STATUS STRIP
+    # ======================================================
+
+    with st.container(border=True):
+
+        status_left, status_middle, status_right = st.columns(3)
+
+        with status_left:
+
+            st.markdown(
+                "**Analysis Confidence**"
+            )
+
+            st.write(
+                confidence
+            )
+
+        with status_middle:
+
+            st.markdown(
+                "**Review Before Proceeding**"
+            )
+
+            st.write(
+                review_status
+            )
+
+        with status_right:
+
+            st.markdown(
+                "**Project**"
+            )
+
+            st.write(
+                st.session_state.get(
+                    "project_name",
+                    "Not provided"
+                )
+            )
+
+
+    st.write("")
+
+
+    # ======================================================
+    # RESULT TABS
+    # ======================================================
+
+    summary_tab, changes_tab, full_tab = st.tabs(
+        [
+            "Executive Summary",
+            "Change Register",
+            "Full Analysis"
+        ]
+    )
+
+
+    with summary_tab:
+
+        st.markdown(
+            section_text(
+                analysis,
+                "EXECUTIVE SUMMARY"
+            )
+        )
+
+        st.markdown("---")
+
+        st.markdown(
+            section_text(
+                analysis,
+                "PROJECT RISK SUMMARY"
+            )
+        )
+
+
+    with changes_tab:
+
+        st.markdown(
+            section_text(
+                analysis,
+                "CHANGE REGISTER"
+            )
+        )
+
+        st.markdown("---")
+
+        st.markdown(
+            section_text(
+                analysis,
+                "RECOMMENDED ACTIONS"
+            )
+        )
+
+
+    with full_tab:
+
+        st.markdown(
+            analysis
+        )
+
+
+    # ======================================================
+    # CREATE REPORTS
+    # ======================================================
 
     quick_pdf = create_pdf_report(
 
@@ -2524,38 +3029,96 @@ if "analysis" in st.session_state:
             "Project"
         )
         .strip()
-        .replace(
-            " ",
-            "_"
-        )
+        .replace(" ", "_")
     )
 
     if not safe_name:
         safe_name = "Project"
 
 
+    # ======================================================
+    # DOWNLOAD SECTION
+    # ======================================================
+
+    st.write("")
+    st.write("")
+
+    st.markdown(
+        """
+        <div class="section-label">Export</div>
+        <div class="section-title">Download project reports</div>
+        <div class="section-description">
+            Use the Quick Report for management review and the Full
+            Report for detailed supporting analysis.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+
     download_left, download_right = st.columns(2)
+
 
     with download_left:
 
-        st.download_button(
-            "📄 Download Quick Report",
-            data=quick_pdf,
-            file_name=(
-                f"{safe_name}_Quick_Report.pdf"
-            ),
-            mime="application/pdf",
-            use_container_width=True
-        )
+        with st.container(border=True):
+
+            st.markdown(
+                "### Quick Report"
+            )
+
+            st.caption(
+                "Executive summary, major risks, change register, "
+                "risk flags, and recommended actions."
+            )
+
+            st.download_button(
+                "Download Quick Report",
+                data=quick_pdf,
+                file_name=(
+                    f"{safe_name}_Quick_Report.pdf"
+                ),
+                mime="application/pdf",
+                use_container_width=True
+            )
+
 
     with download_right:
 
-        st.download_button(
-            "📘 Download Full Report",
-            data=full_pdf,
-            file_name=(
-                f"{safe_name}_Full_Scope_Analysis.pdf"
-            ),
-            mime="application/pdf",
-            use_container_width=True
-        )
+        with st.container(border=True):
+
+            st.markdown(
+                "### Full Analysis"
+            )
+
+            st.caption(
+                "Detailed scope comparison, technical analysis, "
+                "cost, schedule, coordination, documentation, "
+                "and supporting references."
+            )
+
+            st.download_button(
+                "Download Full Report",
+                data=full_pdf,
+                file_name=(
+                    f"{safe_name}_Full_Scope_Analysis.pdf"
+                ),
+                mime="application/pdf",
+                use_container_width=True
+            )
+
+
+# ==========================================================
+# FOOTER
+# ==========================================================
+
+st.markdown(
+    """
+    <div class="site-footer">
+        Construction Scope AI • Preliminary construction-management
+        analysis • Findings should be verified against current project
+        documents and qualified project personnel.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
