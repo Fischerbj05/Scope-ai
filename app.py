@@ -8,7 +8,7 @@ import streamlit as st
 from pypdf import PdfReader
 from dotenv import load_dotenv
 from openai import OpenAI
-import fitz  # PyMuPDF
+import fitz
 
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -32,7 +32,7 @@ from reportlab.platypus.tableofcontents import TableOfContents
 
 
 # ==========================================================
-# APP CONFIGURATION
+# PAGE CONFIG
 # ==========================================================
 
 st.set_page_config(
@@ -69,7 +69,7 @@ client = OpenAI(api_key=api_key)
 
 
 # ==========================================================
-# CONSTANTS
+# REPORT STRUCTURE
 # ==========================================================
 
 MAIN_SECTIONS = [
@@ -92,6 +92,15 @@ MAIN_SECTIONS = [
     "MISSING INFORMATION",
     "ASSUMPTIONS",
     "SUPPORTING REFERENCES",
+    "RECOMMENDED ACTIONS",
+    "RISK FLAGS",
+    "FINAL ASSESSMENT",
+]
+
+QUICK_REPORT_SECTIONS = [
+    "EXECUTIVE SUMMARY",
+    "PROJECT RISK SUMMARY",
+    "CHANGE REGISTER",
     "RECOMMENDED ACTIONS",
     "RISK FLAGS",
     "FINAL ASSESSMENT",
@@ -124,16 +133,13 @@ SUBSECTIONS = [
 
 
 # ==========================================================
-# PDF TEXT EXTRACTION
+# EXTRACT PDF TEXT
 # ==========================================================
 
 def extract_pdf_text(uploaded_file):
 
     pdf_bytes = uploaded_file.getvalue()
-
-    reader = PdfReader(
-        BytesIO(pdf_bytes)
-    )
+    reader = PdfReader(BytesIO(pdf_bytes))
 
     text = ""
 
@@ -155,7 +161,7 @@ def extract_pdf_text(uploaded_file):
 
 
 # ==========================================================
-# PDF TO IMAGE CONVERSION
+# PDF PAGES TO IMAGES
 # ==========================================================
 
 def pdf_pages_to_images(
@@ -179,23 +185,14 @@ def pdf_pages_to_images(
 
     for page_index in range(page_count):
 
-        page = document.load_page(
-            page_index
-        )
-
-        matrix = fitz.Matrix(
-            1.7,
-            1.7
-        )
+        page = document.load_page(page_index)
 
         pix = page.get_pixmap(
-            matrix=matrix,
+            matrix=fitz.Matrix(1.7, 1.7),
             alpha=False
         )
 
-        image_bytes = pix.tobytes(
-            "png"
-        )
+        image_bytes = pix.tobytes("png")
 
         encoded = base64.b64encode(
             image_bytes
@@ -217,7 +214,7 @@ def pdf_pages_to_images(
 
 
 # ==========================================================
-# TEXT CLEANING
+# TEXT HELPERS
 # ==========================================================
 
 def clean_heading(text):
@@ -259,6 +256,155 @@ def format_inline_markdown(text):
 
 
 # ==========================================================
+# SECTION EXTRACTION
+# ==========================================================
+
+def split_sections(analysis_text):
+
+    sections = {}
+    current_section = None
+
+    for line in analysis_text.splitlines():
+
+        clean = clean_heading(line.strip())
+        upper = clean.upper()
+
+        if upper in MAIN_SECTIONS:
+
+            current_section = upper
+
+            sections[current_section] = [
+                upper
+            ]
+
+            continue
+
+        if current_section:
+
+            sections[current_section].append(
+                line
+            )
+
+    return sections
+
+
+def build_quick_report_text(
+    analysis_text
+):
+
+    sections = split_sections(
+        analysis_text
+    )
+
+    selected = []
+
+    for section in QUICK_REPORT_SECTIONS:
+
+        if section in sections:
+
+            selected.extend(
+                sections[section]
+            )
+
+            selected.append("")
+
+    return "\n".join(selected)
+
+
+# ==========================================================
+# EXECUTIVE SUMMARY FIELD EXTRACTION
+# ==========================================================
+
+def extract_field(
+    analysis_text,
+    field_name,
+    default="UNKNOWN"
+):
+
+    pattern = re.compile(
+        rf"\*{{0,2}}{re.escape(field_name)}"
+        rf":\*{{0,2}}\s*(.+)",
+        re.IGNORECASE
+    )
+
+    for line in analysis_text.splitlines():
+
+        match = pattern.search(
+            line.strip()
+        )
+
+        if match:
+
+            return (
+                match
+                .group(1)
+                .replace("**", "")
+                .strip()
+            )
+
+    return default
+
+
+def count_change_register_items(
+    analysis_text
+):
+
+    matches = re.findall(
+        r"\bCR-\d+\b",
+        analysis_text
+    )
+
+    return len(
+        set(matches)
+    )
+
+
+def count_risk_flags(
+    analysis_text,
+    risk_name
+):
+
+    sections = split_sections(
+        analysis_text
+    )
+
+    risk_lines = sections.get(
+        "RISK FLAGS",
+        []
+    )
+
+    current = None
+    count = 0
+
+    for line in risk_lines:
+
+        clean = clean_heading(
+            line.strip()
+        ).upper()
+
+        if clean in [
+            "RED",
+            "YELLOW",
+            "GREEN"
+        ]:
+
+            current = clean
+            continue
+
+        if (
+            current == risk_name.upper()
+            and (
+                line.strip().startswith("• ")
+                or line.strip().startswith("- ")
+            )
+        ):
+
+            count += 1
+
+    return count
+
+
+# ==========================================================
 # MARKDOWN TABLE HELPERS
 # ==========================================================
 
@@ -296,8 +442,8 @@ def parse_markdown_table(lines):
 
         cells = [
             cell.strip()
-            for cell
-            in line.strip().strip("|").split("|")
+            for cell in
+            line.strip("|").split("|")
         ]
 
         if cells:
@@ -307,10 +453,12 @@ def parse_markdown_table(lines):
 
 
 # ==========================================================
-# PDF DOCUMENT TEMPLATE
+# PDF TEMPLATE
 # ==========================================================
 
-class ConstructionReportTemplate(BaseDocTemplate):
+class ConstructionReportTemplate(
+    BaseDocTemplate
+):
 
     def __init__(
         self,
@@ -336,8 +484,8 @@ class ConstructionReportTemplate(BaseDocTemplate):
             pagesize=letter,
             leftMargin=0.7 * inch,
             rightMargin=0.7 * inch,
-            topMargin=0.8 * inch,
-            bottomMargin=0.7 * inch,
+            topMargin=0.82 * inch,
+            bottomMargin=0.72 * inch,
             **kwargs
         )
 
@@ -384,7 +532,7 @@ class ConstructionReportTemplate(BaseDocTemplate):
 
         canvas.saveState()
 
-        # HEADER LINE
+        # HEADER
         canvas.setStrokeColor(
             colors.HexColor("#D0D5DD")
         )
@@ -398,23 +546,21 @@ class ConstructionReportTemplate(BaseDocTemplate):
             letter[1] - 0.55 * inch
         )
 
-        # HEADER LEFT
+        canvas.setFillColor(
+            colors.HexColor("#344054")
+        )
+
         canvas.setFont(
             "Helvetica-Bold",
             8
         )
 
-        canvas.setFillColor(
-            colors.HexColor("#344054")
-        )
-
         canvas.drawString(
             self.leftMargin,
             letter[1] - 0.42 * inch,
-            self.project_name[:55]
+            self.project_name[:50]
         )
 
-        # HEADER RIGHT
         canvas.setFont(
             "Helvetica",
             8
@@ -426,7 +572,7 @@ class ConstructionReportTemplate(BaseDocTemplate):
             "Construction Scope AI Analysis"
         )
 
-        # FOOTER LINE
+        # FOOTER
         canvas.setStrokeColor(
             colors.HexColor("#D0D5DD")
         )
@@ -452,7 +598,7 @@ class ConstructionReportTemplate(BaseDocTemplate):
             canvas.drawString(
                 self.leftMargin,
                 0.33 * inch,
-                self.company_name[:50]
+                self.company_name[:45]
             )
 
         canvas.drawRightString(
@@ -481,16 +627,14 @@ class ConstructionReportTemplate(BaseDocTemplate):
         ):
             return
 
-        heading_text = (
-            flowable.getPlainText()
-        )
+        text = flowable.getPlainText()
 
         key = (
             "section_"
             + str(
                 abs(
                     hash(
-                        heading_text
+                        text
                         + str(self.page)
                     )
                 )
@@ -502,7 +646,7 @@ class ConstructionReportTemplate(BaseDocTemplate):
         )
 
         self.canv.addOutlineEntry(
-            heading_text,
+            text,
             key,
             level=0,
             closed=False
@@ -512,7 +656,7 @@ class ConstructionReportTemplate(BaseDocTemplate):
             "TOCEntry",
             (
                 0,
-                heading_text,
+                text,
                 self.page,
                 key
             )
@@ -520,12 +664,85 @@ class ConstructionReportTemplate(BaseDocTemplate):
 
 
 # ==========================================================
-# REPORT TABLE
+# TABLE WIDTH RATIOS
+# ==========================================================
+
+def table_width_ratios(
+    header_row
+):
+
+    normalized = [
+        cell.lower().strip()
+        for cell in header_row
+    ]
+
+    # CHANGE REGISTER
+    if (
+        len(normalized) == 7
+        and normalized[0] == "id"
+        and "change" in normalized[1]
+    ):
+
+        return [
+            0.08,
+            0.30,
+            0.18,
+            0.10,
+            0.11,
+            0.11,
+            0.12,
+        ]
+
+    # DETAILED SCOPE COMPARISON
+    if (
+        len(normalized) == 5
+        and "scope area" in normalized[0]
+    ):
+
+        return [
+            0.15,
+            0.21,
+            0.21,
+            0.30,
+            0.13,
+        ]
+
+    # QUANTITY TABLE
+    if (
+        len(normalized) == 4
+        and normalized[0] == "item"
+    ):
+
+        return [
+            0.34,
+            0.22,
+            0.22,
+            0.22,
+        ]
+
+    # REFERENCES TABLE
+    if (
+        len(normalized) == 4
+        and normalized[0] == "document"
+    ):
+
+        return [
+            0.24,
+            0.15,
+            0.31,
+            0.30,
+        ]
+
+    return None
+
+
+# ==========================================================
+# CREATE PROFESSIONAL TABLE
 # ==========================================================
 
 def create_report_table(
     rows,
-    width,
+    available_width,
     cell_style
 ):
 
@@ -574,16 +791,27 @@ def create_report_table(
             formatted_row
         )
 
-    column_width = (
-        width
-        / max_columns
+    ratios = table_width_ratios(
+        normalized_rows[0]
     )
+
+    if ratios:
+
+        col_widths = [
+            available_width * ratio
+            for ratio in ratios
+        ]
+
+    else:
+
+        col_widths = [
+            available_width
+            / max_columns
+        ] * max_columns
 
     table = Table(
         formatted_rows,
-        colWidths=[
-            column_width
-        ] * max_columns,
+        colWidths=col_widths,
         repeatRows=1,
         hAlign="LEFT"
     )
@@ -623,7 +851,7 @@ def create_report_table(
                     "GRID",
                     (0, 0),
                     (-1, -1),
-                    0.4,
+                    0.35,
                     colors.HexColor("#D0D5DD")
                 ),
 
@@ -631,28 +859,28 @@ def create_report_table(
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
-                    6
+                    5
                 ),
 
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
-                    6
+                    5
                 ),
 
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
-                    6
+                    5
                 ),
 
                 (
                     "BOTTOMPADDING",
                     (0, 0),
                     (-1, -1),
-                    6
+                    5
                 ),
 
                 (
@@ -672,15 +900,197 @@ def create_report_table(
 
 
 # ==========================================================
-# CREATE PDF REPORT
+# EXECUTIVE DASHBOARD
+# ==========================================================
+
+def build_dashboard(
+    analysis_text,
+    document_width,
+    label_style,
+    value_style
+):
+
+    scope_change = extract_field(
+        analysis_text,
+        "POTENTIAL SCOPE CHANGE"
+    )
+
+    confidence = extract_field(
+        analysis_text,
+        "CONFIDENCE"
+    )
+
+    severity = extract_field(
+        analysis_text,
+        "SEVERITY"
+    )
+
+    review = extract_field(
+        analysis_text,
+        "REVIEW BEFORE PROCEEDING"
+    )
+
+    change_count = count_change_register_items(
+        analysis_text
+    )
+
+    red_count = count_risk_flags(
+        analysis_text,
+        "RED"
+    )
+
+    yellow_count = count_risk_flags(
+        analysis_text,
+        "YELLOW"
+    )
+
+    data = [
+        [
+            Paragraph(
+                "Potential Scope Change",
+                label_style
+            ),
+            Paragraph(
+                scope_change,
+                value_style
+            ),
+            Paragraph(
+                "Overall Severity",
+                label_style
+            ),
+            Paragraph(
+                severity,
+                value_style
+            ),
+        ],
+        [
+            Paragraph(
+                "Confidence",
+                label_style
+            ),
+            Paragraph(
+                confidence,
+                value_style
+            ),
+            Paragraph(
+                "Review Before Proceeding",
+                label_style
+            ),
+            Paragraph(
+                review,
+                value_style
+            ),
+        ],
+        [
+            Paragraph(
+                "Changes Identified",
+                label_style
+            ),
+            Paragraph(
+                str(change_count),
+                value_style
+            ),
+            Paragraph(
+                "Red / Yellow Flags",
+                label_style
+            ),
+            Paragraph(
+                f"{red_count} / {yellow_count}",
+                value_style
+            ),
+        ],
+    ]
+
+    dashboard = Table(
+        data,
+        colWidths=[
+            document_width * 0.28,
+            document_width * 0.22,
+            document_width * 0.28,
+            document_width * 0.22,
+        ]
+    )
+
+    dashboard.setStyle(
+        TableStyle(
+            [
+                (
+                    "BACKGROUND",
+                    (0, 0),
+                    (-1, -1),
+                    colors.HexColor("#F9FAFB")
+                ),
+
+                (
+                    "GRID",
+                    (0, 0),
+                    (-1, -1),
+                    0.5,
+                    colors.HexColor("#D0D5DD")
+                ),
+
+                (
+                    "VALIGN",
+                    (0, 0),
+                    (-1, -1),
+                    "MIDDLE"
+                ),
+
+                (
+                    "LEFTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+
+                (
+                    "RIGHTPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+
+                (
+                    "TOPPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+
+                (
+                    "BOTTOMPADDING",
+                    (0, 0),
+                    (-1, -1),
+                    8
+                ),
+            ]
+        )
+    )
+
+    return dashboard
+
+
+# ==========================================================
+# BUILD PDF
 # ==========================================================
 
 def create_pdf_report(
     project_name,
     project_location,
     company_name,
-    analysis_text
+    analysis_text,
+    quick_mode=False
 ):
+
+    if quick_mode:
+
+        report_text = build_quick_report_text(
+            analysis_text
+        )
+
+    else:
+
+        report_text = analysis_text
 
     buffer = BytesIO()
 
@@ -740,6 +1150,16 @@ def create_pdf_report(
         spaceAfter=16
     )
 
+    dashboard_title = ParagraphStyle(
+        "DashboardTitle",
+        parent=styles["Heading1"],
+        fontName="Helvetica-Bold",
+        fontSize=17,
+        leading=21,
+        textColor=colors.HexColor("#101828"),
+        spaceAfter=12
+    )
+
     section_style = ParagraphStyle(
         "SectionHeading",
         parent=styles["Heading1"],
@@ -747,7 +1167,7 @@ def create_pdf_report(
         fontSize=15,
         leading=19,
         textColor=colors.HexColor("#101828"),
-        spaceBefore=18,
+        spaceBefore=20,
         spaceAfter=9,
         keepWithNext=True
     )
@@ -759,7 +1179,7 @@ def create_pdf_report(
         fontSize=11,
         leading=14,
         textColor=colors.HexColor("#344054"),
-        spaceBefore=11,
+        spaceBefore=12,
         spaceAfter=5,
         keepWithNext=True
     )
@@ -771,7 +1191,7 @@ def create_pdf_report(
         fontSize=11,
         leading=14,
         textColor=colors.HexColor("#175CD3"),
-        spaceBefore=13,
+        spaceBefore=14,
         spaceAfter=6,
         keepWithNext=True
     )
@@ -781,7 +1201,7 @@ def create_pdf_report(
         parent=styles["BodyText"],
         fontName="Helvetica",
         fontSize=9.4,
-        leading=13.2,
+        leading=13.4,
         textColor=colors.HexColor("#344054"),
         spaceAfter=6
     )
@@ -811,8 +1231,28 @@ def create_pdf_report(
     table_cell_style = ParagraphStyle(
         "TableCell",
         parent=body_style,
-        fontSize=7.8,
-        leading=10.2,
+        fontSize=7.5,
+        leading=9.5,
+        spaceAfter=0
+    )
+
+    dashboard_label = ParagraphStyle(
+        "DashboardLabel",
+        parent=body_style,
+        fontName="Helvetica-Bold",
+        fontSize=8.3,
+        leading=11,
+        textColor=colors.HexColor("#667085"),
+        spaceAfter=0
+    )
+
+    dashboard_value = ParagraphStyle(
+        "DashboardValue",
+        parent=body_style,
+        fontName="Helvetica-Bold",
+        fontSize=10.5,
+        leading=13,
+        textColor=colors.HexColor("#101828"),
         spaceAfter=0
     )
 
@@ -841,7 +1281,14 @@ def create_pdf_report(
 
     story.append(
         Paragraph(
-            "Construction Scope AI Analysis",
+            (
+                "Construction Scope AI "
+                + (
+                    "Quick Report"
+                    if quick_mode
+                    else "Analysis"
+                )
+            ),
             cover_title
         )
     )
@@ -923,45 +1370,79 @@ def create_pdf_report(
 
 
     # ======================================================
-    # TABLE OF CONTENTS
+    # EXECUTIVE DASHBOARD
     # ======================================================
 
     story.append(
         Paragraph(
-            "Table of Contents",
-            toc_title
+            "Executive Dashboard",
+            dashboard_title
         )
     )
 
-    toc = TableOfContents()
-
-    toc.levelStyles = [
-        ParagraphStyle(
-            "TOCLevel1",
-            fontName="Helvetica",
-            fontSize=9.5,
-            leading=14,
-            leftIndent=0,
-            rightIndent=8,
-            textColor=colors.HexColor("#344054"),
-            spaceBefore=3
+    story.append(
+        build_dashboard(
+            analysis_text,
+            document.width,
+            dashboard_label,
+            dashboard_value
         )
-    ]
-
-    story.append(
-        toc
     )
 
     story.append(
-        PageBreak()
+        Spacer(
+            1,
+            12
+        )
     )
+
+
+    # ======================================================
+    # FULL REPORT GETS TOC
+    # ======================================================
+
+    if not quick_mode:
+
+        story.append(
+            PageBreak()
+        )
+
+        story.append(
+            Paragraph(
+                "Table of Contents",
+                toc_title
+            )
+        )
+
+        toc = TableOfContents()
+
+        toc.levelStyles = [
+            ParagraphStyle(
+                "TOCLevel1",
+                fontName="Helvetica",
+                fontSize=9.5,
+                leading=14,
+                leftIndent=0,
+                rightIndent=8,
+                textColor=colors.HexColor("#344054"),
+                spaceBefore=3
+            )
+        ]
+
+        story.append(
+            toc
+        )
+
+        story.append(
+            PageBreak()
+        )
 
 
     # ======================================================
     # REPORT BODY
     # ======================================================
 
-    lines = analysis_text.splitlines()
+    lines = report_text.splitlines()
 
     index = 0
 
@@ -969,7 +1450,6 @@ def create_pdf_report(
 
         clean = lines[index].strip()
 
-        # BLANK
         if not clean:
 
             story.append(
@@ -982,7 +1462,6 @@ def create_pdf_report(
             index += 1
             continue
 
-        # DIVIDERS
         if (
             clean.startswith("====")
             or clean in [
@@ -996,10 +1475,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
         # TABLE
-        # ==================================================
-
         if looks_like_table_row(
             clean
         ):
@@ -1023,13 +1499,13 @@ def create_pdf_report(
                 table_lines
             )
 
-            report_table = create_report_table(
+            table = create_report_table(
                 rows,
                 document.width,
                 table_cell_style
             )
 
-            if report_table:
+            if table:
 
                 story.append(
                     Spacer(
@@ -1039,7 +1515,7 @@ def create_pdf_report(
                 )
 
                 story.append(
-                    report_table
+                    table
                 )
 
                 story.append(
@@ -1061,10 +1537,7 @@ def create_pdf_report(
         )
 
 
-        # ==================================================
         # MAIN SECTION
-        # ==================================================
-
         if heading_upper in MAIN_SECTIONS:
 
             story.append(
@@ -1078,10 +1551,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
         # SUBSECTION
-        # ==================================================
-
         if heading_upper in SUBSECTIONS:
 
             story.append(
@@ -1095,10 +1565,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
-        # CHANGE CARD HEADING
-        # ==================================================
-
+        # CHANGE HEADING
         if re.match(
             r"(?i)^change\s+\d+",
             heading_text
@@ -1117,10 +1584,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
-        # MARKDOWN SUBHEADINGS
-        # ==================================================
-
+        # MARKDOWN SUBHEADING
         if (
             clean.startswith("## ")
             or clean.startswith("### ")
@@ -1139,24 +1603,17 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
         # BULLET
-        # ==================================================
-
         if (
             clean.startswith("• ")
             or clean.startswith("- ")
         ):
 
-            bullet_text = (
-                clean[2:].strip()
-            )
-
             story.append(
                 Paragraph(
                     "• "
                     + format_inline_markdown(
-                        bullet_text
+                        clean[2:].strip()
                     ),
                     bullet_style
                 )
@@ -1166,10 +1623,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
-        # NUMBERED ITEM
-        # ==================================================
-
+        # NUMBERED LIST
         number_match = re.match(
             r"^(\d+)\.\s+(.*)",
             clean
@@ -1178,20 +1632,18 @@ def create_pdf_report(
         if number_match:
 
             number = (
-                number_match
-                .group(1)
+                number_match.group(1)
             )
 
-            item_text = (
-                number_match
-                .group(2)
+            text = (
+                number_match.group(2)
             )
 
             story.append(
                 Paragraph(
                     f"<b>{number}.</b> "
                     + format_inline_markdown(
-                        item_text
+                        text
                     ),
                     numbered_style
                 )
@@ -1201,10 +1653,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
-        # KEY: VALUE
-        # ==================================================
-
+        # KEY VALUE
         label_match = re.match(
             r"^\*{0,2}"
             r"([A-Za-z0-9 /&()'’\-]+)"
@@ -1254,10 +1703,7 @@ def create_pdf_report(
             continue
 
 
-        # ==================================================
         # NORMAL TEXT
-        # ==================================================
-
         story.append(
             Paragraph(
                 format_inline_markdown(
@@ -1271,7 +1717,7 @@ def create_pdf_report(
 
 
     # ======================================================
-    # REPORT DISCLAIMER
+    # DISCLAIMER
     # ======================================================
 
     story.append(
@@ -1311,39 +1757,30 @@ ANALYSIS_INSTRUCTIONS = """
 You are an advanced construction change-management and
 document-analysis assistant.
 
-Your job is to compare original construction documents against
-new or revised construction documents and explain meaningful
-construction consequences.
+Compare original construction documents against new or revised
+construction documents and explain meaningful construction consequences.
 
-The goal is NOT simply to identify graphical differences.
-
-The goal is to help a project manager, estimator, superintendent,
-general contractor, or subcontractor understand:
+Focus on helping project managers, estimators, superintendents,
+general contractors, and subcontractors understand:
 
 - what changed
 - where it changed
-- which trades are affected
-- whether it may affect scope
-- potential cost exposure
-- potential schedule exposure
+- affected trades
+- potential scope impact
+- cost exposure
+- schedule exposure
 - coordination requirements
 - documentation risk
 - code or jurisdiction concerns
-- what should happen next
-
-
-==================================================
-CORE RULES
-==================================================
+- recommended next action
 
 Do not provide legal advice.
 
-Do not make a final contractual entitlement determination.
+Do not make final contractual entitlement determinations.
 
 Do not say payment is definitely owed.
 
 Do not invent:
-
 - contract language
 - quantities
 - dimensions
@@ -1353,42 +1790,18 @@ Do not invent:
 - code sections
 - local amendments
 - owner requirements
-- company procedures
+- company policies
 - field conditions
 
-Clearly distinguish:
+Clearly distinguish confirmed facts, assumptions,
+missing information, and items requiring verification.
 
-CONFIRMED FACT
-ASSUMPTION
-MISSING INFORMATION
-ITEM REQUIRING VERIFICATION
+Use document names, drawing sheets, and page numbers
+whenever reasonably identifiable.
 
-Use document names, drawing sheets, and page numbers whenever
-they are reasonably identifiable.
+Do not repeat the same detailed explanation in multiple sections.
 
-Written dimensions take priority over measurements estimated
-from an image.
-
-If visual information is unclear, say so.
-
-Do not manufacture risk simply to fill a report.
-
-Do not repeat the same information unnecessarily.
-
-Keep the report concise enough to be useful while still
-capturing important construction consequences.
-
-
-==================================================
-REPORT ORDER
-==================================================
-
-Use the sections below in EXACTLY this order.
-
-Do not rename sections.
-
-Do not add new main sections.
-
+Keep summaries concise.
 
 ==================================================
 EXECUTIVE SUMMARY
@@ -1410,10 +1823,7 @@ YES / NO
 
 SUMMARY:
 
-Provide no more than two concise paragraphs.
-
-Focus only on the most important findings.
-
+Use no more than two short paragraphs.
 
 ==================================================
 PROJECT RISK SUMMARY
@@ -1428,7 +1838,7 @@ List no more than five.
 
 AFFECTED TRADES
 
-List construction trades affected by the changes.
+List only affected construction trades.
 
 TOP COST RISKS
 
@@ -1448,53 +1858,33 @@ List no more than five.
 
 MOST IMPORTANT NEXT ACTION
 
-Provide one clear action.
-
+Give one clear action.
 
 ==================================================
 CHANGE REGISTER
 ==================================================
 
-Create one markdown table:
+Use exactly this markdown table:
 
 | ID | Change | Primary Trade | Cost Risk | Schedule Risk | Confidence | Source |
 
-Use:
+Use CR-01, CR-02, CR-03 and so on.
 
-CR-01
-CR-02
-CR-03
-
-and so on.
-
-Cost Risk:
-HIGH / MEDIUM / LOW / UNKNOWN
-
-Schedule Risk:
-HIGH / MEDIUM / LOW / UNKNOWN
-
-Confidence:
-HIGH / MEDIUM / LOW
-
-Keep each table cell concise.
-
+Keep wording concise.
 
 ==================================================
 VISUAL DRAWING COMPARISON
 ==================================================
 
-Only include changes supported by supplied drawing images
-or clearly supported drawing text.
-
-For each meaningful change use exactly:
+For each meaningful change use:
 
 CHANGE 1 — Short Title
 
 CHANGE:
-Briefly describe the change.
+Brief description.
 
 PRIMARY TRADE:
-Trade or trades.
+Affected trade.
 
 ORIGINAL SOURCE:
 Drawing / sheet / page.
@@ -1503,10 +1893,10 @@ REVISED SOURCE:
 Drawing / sheet / page.
 
 ORIGINAL CONDITION:
-Describe original condition.
+Original condition.
 
 REVISED CONDITION:
-Describe revised condition.
+Revised condition.
 
 COST RISK:
 HIGH / MEDIUM / LOW / UNKNOWN
@@ -1515,18 +1905,13 @@ SCHEDULE RISK:
 HIGH / MEDIUM / LOW / UNKNOWN
 
 POTENTIAL IMPACT:
-Explain practical construction consequences.
+Practical construction consequence.
 
 RECOMMENDED ACTION:
-Give the next practical action.
+Next action.
 
 CONFIDENCE:
 HIGH / MEDIUM / LOW
-
-Do not report rendering-only or cosmetic differences as
-construction scope unless they are supported by governing
-drawings or notes.
-
 
 ==================================================
 PROJECT AND JURISDICTION INFORMATION
@@ -1560,76 +1945,42 @@ APPLICABLE CODE INFORMATION:
 
 PROJECT-SPECIFIC STANDARDS:
 
-If unavailable, write:
-
-NOT PROVIDED
-
-If user-entered project information conflicts with the
-documents, explicitly identify the conflict.
-
-
 ==================================================
 ORIGINAL REQUIREMENT
 ==================================================
 
 Describe the baseline requirement.
 
-If no executed contract or subcontract was supplied,
-state that the analysis is based on original drawing or
-document requirements rather than confirmed contractual scope.
-
-Use bullets where useful.
-
-Cite the relevant document and sheet/page.
-
+Do not call drawing scope confirmed contractual scope
+unless an executed contract or subcontract was supplied.
 
 ==================================================
 REVISED REQUIREMENT
 ==================================================
 
-Describe the revised requirement.
-
-Identify meaningful:
-
-- additions
-- deletions
-- relocations
-- material changes
-- quantity changes
-- dimensional changes
-- equipment changes
-- sequencing changes
-
-Use source references.
-
+Describe meaningful additions, deletions,
+relocations, quantity changes, material changes,
+equipment changes, and dimensional changes.
 
 ==================================================
 DETAILED SCOPE COMPARISON
 ==================================================
 
-Create a markdown table:
+Use:
 
 | Scope Area | Original | Revised | Potential Impact | Source |
 
-Keep table entries concise.
-
-Do not duplicate long explanations already given elsewhere.
-
+Keep entries concise.
 
 ==================================================
 QUANTITY AND TECHNICAL ANALYSIS
 ==================================================
 
-When confirmed quantities are available use:
+When quantities are confirmed use:
 
 | Item | Original | Revised | Net Change |
 
-Show calculations below the table only when useful.
-
-Clearly identify quantities that cannot be determined.
-
-Never invent dimensions or takeoff quantities.
-
+Do not invent missing quantities.
 
 ==================================================
 DIRECT COST IMPACT
@@ -1637,48 +1988,24 @@ DIRECT COST IMPACT
 
 LABOR
 
-List reasonable labor exposure.
-
 MATERIAL
-
-List additions, deletions, substitutions, waste,
-or procurement exposure.
 
 EQUIPMENT
 
-List relevant equipment impact.
-
 SUBCONTRACTORS AND VENDORS
 
-List vendor, procurement, cancellation, restocking,
-or subcontractor exposure.
+Only list relevant impacts.
 
 Do not invent prices.
-
 
 ==================================================
 INDIRECT COST IMPACT
 ==================================================
 
-Only include relevant items such as:
-
-- project management
-- supervision
-- engineering
-- permit revision
-- testing
-- inspection
-- remobilization
-- disruption
-- lost productivity
-- cleanup
-- storage
-- restocking
-- documentation
-- extended general conditions
-
-Do not claim they definitely occur.
-
+Include only relevant project-management,
+engineering, permitting, inspection, disruption,
+remobilization, productivity, documentation,
+storage, cancellation, or general-condition exposure.
 
 ==================================================
 SCHEDULE IMPACT
@@ -1687,25 +2014,10 @@ SCHEDULE IMPACT
 POTENTIAL SCHEDULE IMPACT:
 HIGH / MEDIUM / LOW / UNKNOWN
 
-Evaluate relevant:
-
-- sequencing
-- procurement
-- long lead material
-- engineering
-- submittals
-- approvals
-- inspections
-- rework
-- access
-- predecessors
-- successors
-- potential critical-path exposure
+Explain major sequencing, procurement,
+approval, inspection, and rework risks.
 
 Do not invent delay days.
-
-If schedule information was not supplied, say so.
-
 
 ==================================================
 COORDINATION AND CODE REVIEW
@@ -1713,124 +2025,53 @@ COORDINATION AND CODE REVIEW
 
 JURISDICTION
 
-Explain confirmed location and jurisdiction conflicts.
-
 STRUCTURAL
-
-Discuss relevant structural coordination.
 
 MECHANICAL
 
-Discuss HVAC or mechanical issues.
-
 PLUMBING
-
-Discuss plumbing issues.
 
 ELECTRICAL AND LIFE SAFETY
 
-Discuss electrical and life-safety issues.
-
 ENVELOPE AND ENERGY
-
-Discuss roofing, waterproofing, insulation,
-air sealing, moisture, and energy issues.
 
 ACCESSIBILITY
 
-Discuss only if relevant.
-
 REGULATORY REVIEW
 
-Consider relevant code families and permitting issues.
-
 Do not invent code sections.
-
-Do not state that a code requirement applies unless the
-jurisdiction and project conditions support it.
-
-If jurisdiction is uncertain, require AHJ verification.
-
 
 ==================================================
 SAFETY IMPACT
 ==================================================
 
-Only include safety concerns directly related to
-identified changes.
-
-Examples when relevant:
-
-- fall exposure
-- structural stability
-- temporary shoring
-- lifting
-- demolition
-- electrical exposure
-- silica
-- excavation
-- temporary guards
-- access
-- material handling
-
-Do not fill the section with generic safety advice.
-
+Include only safety concerns directly related
+to identified changes.
 
 ==================================================
 CONTRACT AND DOCUMENTATION RISK
 ==================================================
 
-Evaluate relevant:
-
-- controlling drawing set
-- revision dates
-- transmittals
-- clouds
-- delta symbols
-- revision narratives
-- RFIs
-- written directives
-- authorization
-- notice requirements
-- photographs
-- daily reports
-- labor records
-- equipment records
-- purchase orders
-- delivery tickets
-- vendor correspondence
+Address relevant revision control,
+transmittals, RFIs, written direction,
+authorization, notices, photographs,
+daily reports, labor records, purchase orders,
+delivery tickets, and vendor records.
 
 Do not provide legal advice.
-
 
 ==================================================
 DOCUMENT CONFLICTS
 ==================================================
 
-List only meaningful conflicts.
-
-Examples:
-
-- drawing versus drawing
-- drawing versus specification
-- original versus revision
-- user information versus project document
-- inconsistent sheet dates
-- conflicting dimensions
-- unresolved equipment locations
-
-If none are found:
-
-NONE IDENTIFIED
-
+List meaningful conflicts only.
 
 ==================================================
 MISSING INFORMATION
 ==================================================
 
-List only information that would materially improve
-the analysis or is needed before acting.
-
+List only information that materially affects
+the analysis or next action.
 
 ==================================================
 ASSUMPTIONS
@@ -1838,21 +2079,13 @@ ASSUMPTIONS
 
 List material assumptions only.
 
-If none:
-
-NONE
-
-
 ==================================================
 SUPPORTING REFERENCES
 ==================================================
 
-Create a markdown table:
+Use:
 
 | Document | Page / Sheet | Requirement or Change | Why It Matters |
-
-Avoid duplicate references.
-
 
 ==================================================
 RECOMMENDED ACTIONS
@@ -1860,51 +2093,33 @@ RECOMMENDED ACTIONS
 
 Provide a prioritized numbered list.
 
-The first action should be the most important.
-
-Focus on practical construction-management actions.
-
-
 ==================================================
 RISK FLAGS
 ==================================================
 
 RED
 
-Only serious concerns requiring immediate review.
+Serious issues requiring immediate review.
 
 YELLOW
 
-Issues requiring clarification, monitoring,
-or additional information.
+Issues requiring clarification or monitoring.
 
 GREEN
 
-Important items reviewed where no material
+Important reviewed areas where no material
 change was identified.
-
-Do not create green flags simply to fill the section.
-
 
 ==================================================
 FINAL ASSESSMENT
 ==================================================
 
-Use no more than three paragraphs.
+Use no more than three concise paragraphs.
 
-Summarize:
-
-- scope-change conclusion
-- primary cost exposure
-- primary schedule exposure
-- primary coordination concern
-- primary regulatory concern
-- primary documentation concern
-- recommended next step
-
-Do not repeat the entire report.
-
-End the report here.
+Summarize the scope conclusion, major cost risk,
+major schedule risk, major coordination risk,
+regulatory concern, documentation concern,
+and recommended next action.
 """
 
 
@@ -1924,9 +2139,9 @@ st.write(
 )
 
 st.info(
-    "This platform provides preliminary construction-management "
-    "analysis. Important findings should be verified against "
-    "current project documents and qualified project personnel."
+    "Preliminary construction-management analysis only. "
+    "Important findings should be verified against current "
+    "project documents and qualified project personnel."
 )
 
 
@@ -1959,7 +2174,7 @@ with right:
 
 
 # ==========================================================
-# DOCUMENTS
+# DOCUMENT UPLOAD
 # ==========================================================
 
 st.header(
@@ -1996,7 +2211,7 @@ with revised_col:
 
 
 # ==========================================================
-# ANALYSIS SETTINGS
+# SETTINGS
 # ==========================================================
 
 st.header(
@@ -2016,9 +2231,7 @@ max_pages = st.number_input(
 )
 
 st.caption(
-    "For testing, 3–6 pages per PDF is recommended. "
-    "Larger drawing sets will eventually use changed-sheet detection "
-    "instead of analyzing every page."
+    "For testing, 3–6 pages per PDF is recommended."
 )
 
 
@@ -2061,7 +2274,6 @@ if st.button(
                 revised_images = []
 
 
-                # ORIGINALS
                 for file in original_files:
 
                     original_text += (
@@ -2080,7 +2292,6 @@ if st.button(
                         )
 
 
-                # REVISIONS
                 for file in revised_files:
 
                     revised_text += (
@@ -2098,10 +2309,6 @@ if st.button(
                             )
                         )
 
-
-                # ==================================================
-                # ANALYSIS INPUT
-                # ==================================================
 
                 prompt_text = f"""
 PROJECT INFORMATION PROVIDED BY USER
@@ -2132,10 +2339,10 @@ NEW / REVISED DOCUMENT TEXT
 
 Compare these documents using the required report structure.
 
-Use supplied project documents as the primary evidence.
+Use supplied documents as the primary evidence.
 
-If user-entered information conflicts with the documents,
-report the conflict rather than choosing one silently.
+If user-entered information conflicts with the project
+documents, report the conflict.
 
 Prioritize meaningful construction changes over cosmetic
 or drafting differences.
@@ -2150,7 +2357,6 @@ or drafting differences.
                 ]
 
 
-                # ORIGINAL DRAWING IMAGES
                 for image in original_images:
 
                     content.append(
@@ -2173,7 +2379,6 @@ or drafting differences.
                     )
 
 
-                # REVISED DRAWING IMAGES
                 for image in revised_images:
 
                     content.append(
@@ -2266,8 +2471,7 @@ if "analysis" in st.session_state:
     )
 
 
-    # PDF
-    pdf_report = create_pdf_report(
+    quick_pdf = create_pdf_report(
 
         st.session_state.get(
             "project_name",
@@ -2284,7 +2488,32 @@ if "analysis" in st.session_state:
             ""
         ),
 
-        analysis
+        analysis,
+
+        quick_mode=True
+    )
+
+
+    full_pdf = create_pdf_report(
+
+        st.session_state.get(
+            "project_name",
+            ""
+        ),
+
+        st.session_state.get(
+            "project_location",
+            ""
+        ),
+
+        st.session_state.get(
+            "company_name",
+            ""
+        ),
+
+        analysis,
+
+        quick_mode=False
     )
 
 
@@ -2302,16 +2531,31 @@ if "analysis" in st.session_state:
     )
 
     if not safe_name:
-
         safe_name = "Project"
 
 
-    st.download_button(
-        "📄 Download Professional PDF Report",
-        data=pdf_report,
-        file_name=(
-            f"{safe_name}_Scope_Analysis.pdf"
-        ),
-        mime="application/pdf",
-        use_container_width=True
-    )
+    download_left, download_right = st.columns(2)
+
+    with download_left:
+
+        st.download_button(
+            "📄 Download Quick Report",
+            data=quick_pdf,
+            file_name=(
+                f"{safe_name}_Quick_Report.pdf"
+            ),
+            mime="application/pdf",
+            use_container_width=True
+        )
+
+    with download_right:
+
+        st.download_button(
+            "📘 Download Full Report",
+            data=full_pdf,
+            file_name=(
+                f"{safe_name}_Full_Scope_Analysis.pdf"
+            ),
+            mime="application/pdf",
+            use_container_width=True
+        )
