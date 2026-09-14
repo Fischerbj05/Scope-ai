@@ -44,351 +44,11 @@ st.set_page_config(
 
 
 # ==========================================================
-# WEBSITE STYLING
+# SESSION STATE
 # ==========================================================
 
-st.markdown(
-    """
-    <style>
-
-    /* =====================================================
-       GLOBAL
-    ===================================================== */
-
-    [data-testid="stAppViewContainer"] {
-        background: #f5f7fa;
-    }
-
-    [data-testid="stHeader"] {
-        background: rgba(255,255,255,0);
-    }
-
-    .block-container {
-        max-width: 1180px;
-        padding-top: 1.2rem;
-        padding-bottom: 4rem;
-    }
-
-    html, body, [class*="css"] {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                     Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    h1, h2, h3 {
-        color: #101828;
-        letter-spacing: -0.02em;
-    }
-
-
-    /* =====================================================
-       TOP NAV
-    ===================================================== */
-
-    .top-nav {
-        background: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        padding: 14px 20px;
-        margin-bottom: 18px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-    }
-
-    .brand-wrap {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-
-    .brand-icon {
-        width: 38px;
-        height: 38px;
-        border-radius: 10px;
-        background: #175cd3;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    .brand-name {
-        font-size: 18px;
-        font-weight: 700;
-        color: #101828;
-        margin: 0;
-    }
-
-    .brand-sub {
-        font-size: 11px;
-        color: #667085;
-        margin-top: 1px;
-    }
-
-    .nav-badge {
-        background: #eff4ff;
-        color: #175cd3;
-        border: 1px solid #d1e0ff;
-        border-radius: 999px;
-        padding: 6px 12px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-
-
-    /* =====================================================
-       HERO
-    ===================================================== */
-
-    .hero {
-        background:
-            linear-gradient(135deg, #101828 0%, #1d2939 60%, #344054 100%);
-        border-radius: 20px;
-        padding: 42px 44px;
-        margin-bottom: 22px;
-        box-shadow: 0 12px 32px rgba(16,24,40,0.12);
-    }
-
-    .hero-eyebrow {
-        display: inline-block;
-        background: rgba(255,255,255,0.09);
-        border: 1px solid rgba(255,255,255,0.13);
-        border-radius: 999px;
-        padding: 6px 11px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #d1e9ff;
-        margin-bottom: 16px;
-    }
-
-    .hero h1 {
-        color: #ffffff !important;
-        font-size: 38px;
-        line-height: 1.1;
-        margin: 0 0 14px 0;
-        max-width: 760px;
-    }
-
-    .hero p {
-        color: #d0d5dd;
-        font-size: 17px;
-        line-height: 1.6;
-        max-width: 820px;
-        margin: 0;
-    }
-
-    .hero-highlight {
-        color: #84adff;
-        font-weight: 600;
-    }
-
-
-    /* =====================================================
-       FEATURE CARDS
-    ===================================================== */
-
-    .feature-card {
-        background: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 14px;
-        padding: 18px;
-        min-height: 135px;
-        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-    }
-
-    .feature-icon {
-        font-size: 22px;
-        margin-bottom: 8px;
-    }
-
-    .feature-title {
-        font-size: 14px;
-        font-weight: 700;
-        color: #101828;
-        margin-bottom: 5px;
-    }
-
-    .feature-text {
-        font-size: 12.5px;
-        color: #667085;
-        line-height: 1.45;
-    }
-
-
-    /* =====================================================
-       SECTION LABEL
-    ===================================================== */
-
-    .section-label {
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #175cd3;
-        margin-bottom: 5px;
-    }
-
-    .section-title {
-        font-size: 23px;
-        font-weight: 700;
-        color: #101828;
-        margin-bottom: 4px;
-    }
-
-    .section-description {
-        font-size: 14px;
-        color: #667085;
-        margin-bottom: 18px;
-    }
-
-
-    /* =====================================================
-       NATIVE STREAMLIT CONTAINERS
-    ===================================================== */
-
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        background: #ffffff;
-        border: 1px solid #e4e7ec !important;
-        border-radius: 14px !important;
-        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-    }
-
-
-    /* =====================================================
-       INPUTS
-    ===================================================== */
-
-    div[data-baseweb="input"] {
-        border-radius: 9px;
-    }
-
-    div[data-testid="stTextInput"] input {
-        border-radius: 9px;
-        min-height: 44px;
-    }
-
-    div[data-testid="stNumberInput"] input {
-        border-radius: 9px;
-    }
-
-
-    /* =====================================================
-       FILE UPLOADERS
-    ===================================================== */
-
-    div[data-testid="stFileUploader"] {
-        background: #fafbfc;
-        border-radius: 12px;
-    }
-
-    div[data-testid="stFileUploaderDropzone"] {
-        border: 1.5px dashed #b8c2d1;
-        border-radius: 12px;
-        background: #f9fafb;
-        padding-top: 20px;
-        padding-bottom: 20px;
-    }
-
-    div[data-testid="stFileUploaderDropzone"]:hover {
-        border-color: #175cd3;
-        background: #f5f8ff;
-    }
-
-
-    /* =====================================================
-       BUTTONS
-    ===================================================== */
-
-    .stButton > button {
-        min-height: 50px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 15px;
-        border: none;
-        transition: all .18s ease;
-    }
-
-    .stButton > button[kind="primary"] {
-        background: #175cd3;
-        color: white;
-    }
-
-    .stButton > button[kind="primary"]:hover {
-        background: #1849a9;
-        box-shadow: 0 5px 14px rgba(23,92,211,0.22);
-        transform: translateY(-1px);
-    }
-
-    div[data-testid="stDownloadButton"] button {
-        min-height: 48px;
-        border-radius: 10px;
-        font-weight: 650;
-    }
-
-
-    /* =====================================================
-       METRICS
-    ===================================================== */
-
-    div[data-testid="stMetric"] {
-        background: #ffffff;
-        border: 1px solid #e4e7ec;
-        border-radius: 12px;
-        padding: 16px 18px;
-        box-shadow: 0 1px 3px rgba(16,24,40,0.04);
-    }
-
-    div[data-testid="stMetricLabel"] {
-        font-size: 12px;
-        color: #667085;
-        font-weight: 600;
-    }
-
-    div[data-testid="stMetricValue"] {
-        font-size: 23px;
-        color: #101828;
-        font-weight: 700;
-    }
-
-
-    /* =====================================================
-       TABS
-    ===================================================== */
-
-    button[data-baseweb="tab"] {
-        font-weight: 600;
-        font-size: 14px;
-    }
-
-
-    /* =====================================================
-       INFO BOXES
-    ===================================================== */
-
-    div[data-testid="stAlert"] {
-        border-radius: 12px;
-    }
-
-
-    /* =====================================================
-       FOOTER
-    ===================================================== */
-
-    .site-footer {
-        margin-top: 45px;
-        padding-top: 18px;
-        border-top: 1px solid #e4e7ec;
-        color: #98a2b3;
-        text-align: center;
-        font-size: 11px;
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
 
 
 # ==========================================================
@@ -415,6 +75,354 @@ if not api_key:
     st.stop()
 
 client = OpenAI(api_key=api_key)
+
+
+# ==========================================================
+# THEME VALUES
+# ==========================================================
+
+if st.session_state.dark_mode:
+
+    PAGE_BG = "#0F141B"
+    CARD_BG = "#151B24"
+    CARD_ALT = "#1B2330"
+    INPUT_BG = "#111820"
+    TEXT_MAIN = "#F3F4F6"
+    TEXT_MUTED = "#A5ADBA"
+    BORDER = "#2C3542"
+    ACCENT = "#5B8DEF"
+    ACCENT_DARK = "#4776D0"
+    HEADER_BG = "#121820"
+
+else:
+
+    PAGE_BG = "#F4F6F8"
+    CARD_BG = "#FFFFFF"
+    CARD_ALT = "#F8FAFC"
+    INPUT_BG = "#FFFFFF"
+    TEXT_MAIN = "#17212B"
+    TEXT_MUTED = "#667085"
+    BORDER = "#DCE1E7"
+    ACCENT = "#2457A7"
+    ACCENT_DARK = "#1E4787"
+    HEADER_BG = "#FFFFFF"
+
+
+# ==========================================================
+# WEBSITE STYLES
+# ==========================================================
+
+st.markdown(
+    f"""
+    <style>
+
+    /* PAGE */
+
+    [data-testid="stAppViewContainer"] {{
+        background: {PAGE_BG};
+    }}
+
+    [data-testid="stHeader"] {{
+        background: transparent;
+    }}
+
+    [data-testid="stToolbar"] {{
+        right: 1rem;
+    }}
+
+    .block-container {{
+        max-width: 1160px;
+        padding-top: 1rem;
+        padding-bottom: 4rem;
+    }}
+
+    html, body, [class*="css"] {{
+        font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            Roboto,
+            Helvetica,
+            Arial,
+            sans-serif;
+    }}
+
+
+    /* GLOBAL TEXT */
+
+    h1, h2, h3, h4, h5, h6 {{
+        color: {TEXT_MAIN} !important;
+        letter-spacing: -0.015em;
+    }}
+
+    p {{
+        color: {TEXT_MUTED};
+    }}
+
+    label {{
+        color: {TEXT_MAIN} !important;
+    }}
+
+
+    /* HEADER */
+
+    .product-header {{
+        background: {HEADER_BG};
+        border: 1px solid {BORDER};
+        border-radius: 12px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+    }}
+
+    .brand-row {{
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }}
+
+    .brand-mark {{
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        background: {ACCENT};
+        color: white;
+        font-size: 18px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }}
+
+    .brand-title {{
+        color: {TEXT_MAIN};
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 1.1;
+    }}
+
+    .brand-subtitle {{
+        color: {TEXT_MUTED};
+        font-size: 11px;
+        margin-top: 3px;
+    }}
+
+
+    /* HERO */
+
+    .hero {{
+        background: {CARD_BG};
+        border: 1px solid {BORDER};
+        border-radius: 14px;
+        padding: 34px 36px;
+        margin-bottom: 24px;
+    }}
+
+    .hero-kicker {{
+        color: {ACCENT};
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }}
+
+    .hero-title {{
+        color: {TEXT_MAIN};
+        font-size: 34px;
+        line-height: 1.12;
+        letter-spacing: -0.035em;
+        font-weight: 750;
+        max-width: 720px;
+        margin-bottom: 12px;
+    }}
+
+    .hero-text {{
+        color: {TEXT_MUTED};
+        font-size: 15px;
+        line-height: 1.6;
+        max-width: 800px;
+    }}
+
+
+    /* SECTION HEADERS */
+
+    .section-number {{
+        color: {ACCENT};
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }}
+
+    .section-title {{
+        color: {TEXT_MAIN};
+        font-size: 23px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }}
+
+    .section-copy {{
+        color: {TEXT_MUTED};
+        font-size: 13.5px;
+        margin-bottom: 16px;
+    }}
+
+
+    /* CONTAINERS */
+
+    div[data-testid="stVerticalBlockBorderWrapper"] {{
+        background: {CARD_BG};
+        border: 1px solid {BORDER} !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+    }}
+
+
+    /* TEXT INPUT */
+
+    div[data-baseweb="input"] {{
+        background: {INPUT_BG} !important;
+        border-radius: 8px !important;
+    }}
+
+    div[data-testid="stTextInput"] input {{
+        background: {INPUT_BG} !important;
+        color: {TEXT_MAIN} !important;
+        min-height: 44px;
+        border-radius: 8px !important;
+    }}
+
+    div[data-testid="stTextInput"] input::placeholder {{
+        color: {TEXT_MUTED} !important;
+        opacity: 0.75;
+    }}
+
+    div[data-testid="stNumberInput"] input {{
+        background: {INPUT_BG} !important;
+        color: {TEXT_MAIN} !important;
+    }}
+
+
+    /* CAPTION */
+
+    [data-testid="stCaptionContainer"] {{
+        color: {TEXT_MUTED} !important;
+    }}
+
+
+    /* FILE UPLOADER */
+
+    div[data-testid="stFileUploader"] {{
+        background: transparent;
+    }}
+
+    div[data-testid="stFileUploaderDropzone"] {{
+        background: {CARD_ALT};
+        border: 1.5px dashed {BORDER};
+        border-radius: 10px;
+        padding-top: 18px;
+        padding-bottom: 18px;
+    }}
+
+    div[data-testid="stFileUploaderDropzone"]:hover {{
+        border-color: {ACCENT};
+    }}
+
+
+    /* BUTTONS */
+
+    .stButton > button {{
+        min-height: 48px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 650;
+        transition: 0.15s ease;
+    }}
+
+    .stButton > button[kind="primary"] {{
+        background: {ACCENT};
+        color: white;
+        border: 1px solid {ACCENT};
+    }}
+
+    .stButton > button[kind="primary"]:hover {{
+        background: {ACCENT_DARK};
+        border-color: {ACCENT_DARK};
+    }}
+
+    div[data-testid="stDownloadButton"] button {{
+        min-height: 46px;
+        border-radius: 8px;
+        font-weight: 650;
+    }}
+
+
+    /* METRICS */
+
+    div[data-testid="stMetric"] {{
+        background: {CARD_BG};
+        border: 1px solid {BORDER};
+        border-radius: 10px;
+        padding: 15px 17px;
+        box-shadow: none;
+    }}
+
+    div[data-testid="stMetricLabel"] {{
+        color: {TEXT_MUTED} !important;
+        font-size: 12px;
+        font-weight: 600;
+    }}
+
+    div[data-testid="stMetricValue"] {{
+        color: {TEXT_MAIN} !important;
+        font-size: 23px;
+        font-weight: 700;
+    }}
+
+
+    /* TABS */
+
+    button[data-baseweb="tab"] {{
+        color: {TEXT_MUTED};
+        font-size: 13px;
+        font-weight: 600;
+    }}
+
+    button[data-baseweb="tab"][aria-selected="true"] {{
+        color: {ACCENT};
+    }}
+
+
+    /* ALERTS */
+
+    div[data-testid="stAlert"] {{
+        border-radius: 10px;
+    }}
+
+
+    /* DIVIDER */
+
+    hr {{
+        border-color: {BORDER} !important;
+    }}
+
+
+    /* FOOTER */
+
+    .footer {{
+        margin-top: 42px;
+        padding-top: 17px;
+        border-top: 1px solid {BORDER};
+        text-align: center;
+        color: {TEXT_MUTED};
+        font-size: 11px;
+    }}
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # ==========================================================
@@ -482,7 +490,7 @@ SUBSECTIONS = [
 
 
 # ==========================================================
-# PDF TEXT
+# PDF TEXT EXTRACTION
 # ==========================================================
 
 def extract_pdf_text(uploaded_file):
@@ -507,7 +515,7 @@ def extract_pdf_text(uploaded_file):
 
 
 # ==========================================================
-# PDF IMAGES
+# PDF IMAGE EXTRACTION
 # ==========================================================
 
 def pdf_pages_to_images(uploaded_file, max_pages):
@@ -535,15 +543,19 @@ def pdf_pages_to_images(uploaded_file, max_pages):
             alpha=False
         )
 
+        image_bytes = pix.tobytes("png")
+
         encoded = base64.b64encode(
-            pix.tobytes("png")
+            image_bytes
         ).decode("utf-8")
 
         images.append(
             {
                 "document": uploaded_file.name,
                 "page": page_index + 1,
-                "image_url": f"data:image/png;base64,{encoded}"
+                "image_url": (
+                    f"data:image/png;base64,{encoded}"
+                )
             }
         )
 
@@ -566,7 +578,10 @@ def clean_heading(text):
         text
     )
 
-    text = text.replace("**", "")
+    text = text.replace(
+        "**",
+        ""
+    )
 
     return text.strip()
 
@@ -613,9 +628,14 @@ def split_sections(analysis_text):
     return sections
 
 
-def section_text(analysis_text, section_name):
+def section_text(
+    analysis_text,
+    section_name
+):
 
-    sections = split_sections(analysis_text)
+    sections = split_sections(
+        analysis_text
+    )
 
     lines = sections.get(
         section_name,
@@ -625,9 +645,13 @@ def section_text(analysis_text, section_name):
     return "\n".join(lines)
 
 
-def build_quick_report_text(analysis_text):
+def build_quick_report_text(
+    analysis_text
+):
 
-    sections = split_sections(analysis_text)
+    sections = split_sections(
+        analysis_text
+    )
 
     selected = []
 
@@ -674,7 +698,9 @@ def extract_field(
     return default
 
 
-def count_change_register_items(analysis_text):
+def count_change_register_items(
+    analysis_text
+):
 
     matches = re.findall(
         r"\bCR-\d+\b",
@@ -730,7 +756,7 @@ def count_risk_flags(
 
 
 # ==========================================================
-# MARKDOWN TABLES
+# MARKDOWN TABLE HELPERS
 # ==========================================================
 
 def looks_like_table_row(line):
@@ -767,7 +793,8 @@ def parse_markdown_table(lines):
 
         cells = [
             cell.strip()
-            for cell in line.strip("|").split("|")
+            for cell in
+            line.strip("|").split("|")
         ]
 
         if cells:
@@ -777,7 +804,7 @@ def parse_markdown_table(lines):
 
 
 # ==========================================================
-# PDF TEMPLATE
+# PDF DOCUMENT TEMPLATE
 # ==========================================================
 
 class ConstructionReportTemplate(BaseDocTemplate):
@@ -827,17 +854,21 @@ class ConstructionReportTemplate(BaseDocTemplate):
             id="report"
         )
 
+        cover_template = PageTemplate(
+            id="cover",
+            frames=[cover_frame]
+        )
+
+        report_template = PageTemplate(
+            id="report",
+            frames=[report_frame],
+            onPage=self.draw_header_footer
+        )
+
         self.addPageTemplates(
             [
-                PageTemplate(
-                    id="cover",
-                    frames=[cover_frame]
-                ),
-                PageTemplate(
-                    id="report",
-                    frames=[report_frame],
-                    onPage=self.draw_header_footer
-                ),
+                cover_template,
+                report_template
             ]
         )
 
@@ -937,7 +968,10 @@ class ConstructionReportTemplate(BaseDocTemplate):
         ):
             return
 
-        if flowable.style.name != "SectionHeading":
+        if (
+            flowable.style.name
+            != "SectionHeading"
+        ):
             return
 
         text = flowable.getPlainText()
@@ -954,7 +988,9 @@ class ConstructionReportTemplate(BaseDocTemplate):
             )
         )
 
-        self.canv.bookmarkPage(key)
+        self.canv.bookmarkPage(
+            key
+        )
 
         self.canv.addOutlineEntry(
             text,
@@ -985,6 +1021,7 @@ def table_width_ratios(header_row):
         for cell in header_row
     ]
 
+    # CHANGE REGISTER
     if (
         len(normalized) == 7
         and normalized[0] == "id"
@@ -1000,6 +1037,7 @@ def table_width_ratios(header_row):
             0.12,
         ]
 
+    # DETAILED SCOPE COMPARISON
     if (
         len(normalized) == 5
         and "scope area" in normalized[0]
@@ -1013,6 +1051,7 @@ def table_width_ratios(header_row):
             0.13,
         ]
 
+    # QUANTITY TABLE
     if (
         len(normalized) == 4
         and normalized[0] == "item"
@@ -1025,6 +1064,7 @@ def table_width_ratios(header_row):
             0.22,
         ]
 
+    # REFERENCES TABLE
     if (
         len(normalized) == 4
         and normalized[0] == "document"
@@ -1041,7 +1081,7 @@ def table_width_ratios(header_row):
 
 
 # ==========================================================
-# CREATE PDF TABLE
+# CREATE REPORT TABLE
 # ==========================================================
 
 def create_report_table(
@@ -1062,11 +1102,16 @@ def create_report_table(
 
     for row in rows:
 
-        normalized_rows.append(
+        padded = (
             row
             + [""] * (
-                max_columns - len(row)
+                max_columns
+                - len(row)
             )
+        )
+
+        normalized_rows.append(
+            padded
         )
 
     formatted_rows = []
@@ -1076,7 +1121,9 @@ def create_report_table(
         formatted_rows.append(
             [
                 Paragraph(
-                    format_inline_markdown(cell),
+                    format_inline_markdown(
+                        cell
+                    ),
                     cell_style
                 )
                 for cell in row
@@ -1097,7 +1144,8 @@ def create_report_table(
     else:
 
         col_widths = [
-            available_width / max_columns
+            available_width
+            / max_columns
         ] * max_columns
 
     table = Table(
@@ -1116,24 +1164,28 @@ def create_report_table(
                     (-1, 0),
                     colors.HexColor("#344054")
                 ),
+
                 (
                     "TEXTCOLOR",
                     (0, 0),
                     (-1, 0),
                     colors.white
                 ),
+
                 (
                     "FONTNAME",
                     (0, 0),
                     (-1, 0),
                     "Helvetica-Bold"
                 ),
+
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "TOP"
                 ),
+
                 (
                     "GRID",
                     (0, 0),
@@ -1141,30 +1193,35 @@ def create_report_table(
                     0.35,
                     colors.HexColor("#D0D5DD")
                 ),
+
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
+
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
+
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
+
                 (
                     "BOTTOMPADDING",
                     (0, 0),
                     (-1, -1),
                     5
                 ),
+
                 (
                     "ROWBACKGROUNDS",
                     (0, 1),
@@ -1182,7 +1239,7 @@ def create_report_table(
 
 
 # ==========================================================
-# PDF DASHBOARD
+# PDF EXECUTIVE DASHBOARD
 # ==========================================================
 
 def build_dashboard(
@@ -1302,6 +1359,7 @@ def build_dashboard(
                     (-1, -1),
                     colors.HexColor("#F9FAFB")
                 ),
+
                 (
                     "GRID",
                     (0, 0),
@@ -1309,30 +1367,35 @@ def build_dashboard(
                     0.5,
                     colors.HexColor("#D0D5DD")
                 ),
+
                 (
                     "VALIGN",
                     (0, 0),
                     (-1, -1),
                     "MIDDLE"
                 ),
+
                 (
                     "LEFTPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
+
                 (
                     "RIGHTPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
+
                 (
                     "TOPPADDING",
                     (0, 0),
                     (-1, -1),
                     8
                 ),
+
                 (
                     "BOTTOMPADDING",
                     (0, 0),
@@ -1347,7 +1410,7 @@ def build_dashboard(
 
 
 # ==========================================================
-# CREATE PDF
+# CREATE PDF REPORT
 # ==========================================================
 
 def create_pdf_report(
@@ -1359,7 +1422,9 @@ def create_pdf_report(
 ):
 
     report_text = (
-        build_quick_report_text(analysis_text)
+        build_quick_report_text(
+            analysis_text
+        )
         if quick_mode
         else analysis_text
     )
@@ -1373,6 +1438,11 @@ def create_pdf_report(
     )
 
     styles = getSampleStyleSheet()
+
+
+    # ======================================================
+    # PDF STYLES
+    # ======================================================
 
     cover_title = ParagraphStyle(
         "CoverTitle",
@@ -1531,10 +1601,20 @@ def create_pdf_report(
         textColor=colors.HexColor("#667085")
     )
 
+
     story = []
 
+
+    # ======================================================
     # COVER
-    story.append(Spacer(1, 1.2 * inch))
+    # ======================================================
+
+    story.append(
+        Spacer(
+            1,
+            1.2 * inch
+        )
+    )
 
     story.append(
         Paragraph(
@@ -1549,12 +1629,14 @@ def create_pdf_report(
 
     story.append(
         Paragraph(
-            project_name or "Construction Project",
+            project_name
+            or "Construction Project",
             cover_project
         )
     )
 
     if project_location:
+
         story.append(
             Paragraph(
                 project_location,
@@ -1563,6 +1645,7 @@ def create_pdf_report(
         )
 
     if company_name:
+
         story.append(
             Paragraph(
                 company_name,
@@ -1601,20 +1684,28 @@ def create_pdf_report(
 
     story.append(
         Paragraph(
-            datetime.now().strftime("%B %d, %Y"),
+            datetime.now().strftime(
+                "%B %d, %Y"
+            ),
             cover_detail
         )
     )
 
     story.append(
-        NextPageTemplate("report")
+        NextPageTemplate(
+            "report"
+        )
     )
 
     story.append(
         PageBreak()
     )
 
+
+    # ======================================================
     # EXECUTIVE DASHBOARD
+    # ======================================================
+
     story.append(
         Paragraph(
             "Executive Dashboard",
@@ -1638,7 +1729,11 @@ def create_pdf_report(
         )
     )
 
-    # FULL REPORT TOC
+
+    # ======================================================
+    # TABLE OF CONTENTS
+    # ======================================================
+
     if not quick_mode:
 
         story.append(
@@ -1668,10 +1763,18 @@ def create_pdf_report(
         ]
 
         story.append(toc)
-        story.append(PageBreak())
 
+        story.append(
+            PageBreak()
+        )
+
+
+    # ======================================================
     # BODY
+    # ======================================================
+
     lines = report_text.splitlines()
+
     index = 0
 
     while index < len(lines):
@@ -1692,13 +1795,21 @@ def create_pdf_report(
 
         if (
             clean.startswith("====")
-            or clean in ["---", "***", "___"]
+            or clean in [
+                "---",
+                "***",
+                "___"
+            ]
         ):
 
             index += 1
             continue
 
-        if looks_like_table_row(clean):
+
+        # TABLE
+        if looks_like_table_row(
+            clean
+        ):
 
             table_lines = []
 
@@ -1734,7 +1845,9 @@ def create_pdf_report(
                     )
                 )
 
-                story.append(table)
+                story.append(
+                    table
+                )
 
                 story.append(
                     Spacer(
@@ -1745,9 +1858,15 @@ def create_pdf_report(
 
             continue
 
-        heading_text = clean_heading(clean)
+
+        heading_text = clean_heading(
+            clean
+        )
+
         heading_upper = heading_text.upper()
 
+
+        # MAIN SECTION
         if heading_upper in MAIN_SECTIONS:
 
             story.append(
@@ -1760,6 +1879,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # SUBSECTION
         if heading_upper in SUBSECTIONS:
 
             story.append(
@@ -1772,6 +1893,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # CHANGE HEADING
         if re.match(
             r"(?i)^change\s+\d+",
             heading_text
@@ -1789,6 +1912,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # MARKDOWN SUBHEADING
         if (
             clean.startswith("## ")
             or clean.startswith("### ")
@@ -1806,6 +1931,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # BULLET
         if (
             clean.startswith("• ")
             or clean.startswith("- ")
@@ -1824,6 +1951,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # NUMBERED LIST
         number_match = re.match(
             r"^(\d+)\.\s+(.*)",
             clean
@@ -1844,6 +1973,8 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # KEY VALUE
         label_match = re.match(
             r"^\*{0,2}"
             r"([A-Za-z0-9 /&()'’\-]+)"
@@ -1853,12 +1984,23 @@ def create_pdf_report(
 
         if label_match:
 
-            label = label_match.group(1).strip()
-            value = label_match.group(2).strip()
+            label = (
+                label_match
+                .group(1)
+                .strip()
+            )
+
+            value = (
+                label_match
+                .group(2)
+                .strip()
+            )
 
             formatted = (
                 "<b>"
-                + format_inline_markdown(label)
+                + format_inline_markdown(
+                    label
+                )
                 + ":</b>"
             )
 
@@ -1866,7 +2008,9 @@ def create_pdf_report(
 
                 formatted += (
                     " "
-                    + format_inline_markdown(value)
+                    + format_inline_markdown(
+                        value
+                    )
                 )
 
             story.append(
@@ -1879,14 +2023,23 @@ def create_pdf_report(
             index += 1
             continue
 
+
+        # NORMAL TEXT
         story.append(
             Paragraph(
-                format_inline_markdown(clean),
+                format_inline_markdown(
+                    clean
+                ),
                 body_style
             )
         )
 
         index += 1
+
+
+    # ======================================================
+    # DISCLAIMER
+    # ======================================================
 
     story.append(
         Spacer(
@@ -1908,7 +2061,9 @@ def create_pdf_report(
         )
     )
 
-    document.multiBuild(story)
+    document.multiBuild(
+        story
+    )
 
     buffer.seek(0)
 
@@ -1916,7 +2071,7 @@ def create_pdf_report(
 
 
 # ==========================================================
-# AI INSTRUCTIONS
+# AI ANALYSIS INSTRUCTIONS
 # ==========================================================
 
 ANALYSIS_INSTRUCTIONS = """
@@ -2290,26 +2445,45 @@ and recommended next action.
 
 
 # ==========================================================
-# TOP NAVIGATION
+# HEADER
 # ==========================================================
 
-st.markdown(
-    """
-    <div class="top-nav">
-        <div class="brand-wrap">
-            <div class="brand-icon">🏗️</div>
-            <div>
-                <div class="brand-name">Construction Scope AI</div>
-                <div class="brand-sub">
-                    Construction change intelligence
+header_left, header_right = st.columns(
+    [5, 1]
+)
+
+with header_left:
+
+    st.markdown(
+        """
+        <div class="product-header">
+            <div class="brand-row">
+                <div class="brand-mark">C</div>
+                <div>
+                    <div class="brand-title">
+                        Construction Scope AI
+                    </div>
+                    <div class="brand-subtitle">
+                        Construction change and scope review
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="nav-badge">Early Access</div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+        """,
+        unsafe_allow_html=True
+    )
+
+with header_right:
+
+    new_dark_mode = st.toggle(
+        "Dark mode",
+        value=st.session_state.dark_mode
+    )
+
+    if new_dark_mode != st.session_state.dark_mode:
+
+        st.session_state.dark_mode = new_dark_mode
+        st.rerun()
 
 
 # ==========================================================
@@ -2319,21 +2493,22 @@ st.markdown(
 st.markdown(
     """
     <div class="hero">
-        <div class="hero-eyebrow">
-            AI-POWERED CHANGE MANAGEMENT
+
+        <div class="hero-kicker">
+            Construction Document Review
         </div>
 
-        <h1>
-            Turn drawing revisions into
-            construction decisions.
-        </h1>
+        <div class="hero-title">
+            Understand what changed before it affects the job.
+        </div>
 
-        <p>
-            Compare original and revised project documents to identify
-            <span class="hero-highlight">scope changes</span>,
-            affected trades, cost exposure, schedule risk,
-            coordination issues, and recommended next actions.
-        </p>
+        <div class="hero-text">
+            Compare original and revised construction documents
+            to identify meaningful scope changes, affected trades,
+            potential cost and schedule exposure, coordination issues,
+            and recommended next actions.
+        </div>
+
     </div>
     """,
     unsafe_allow_html=True
@@ -2341,73 +2516,15 @@ st.markdown(
 
 
 # ==========================================================
-# FEATURE STRIP
-# ==========================================================
-
-feature1, feature2, feature3 = st.columns(3)
-
-with feature1:
-
-    st.markdown(
-        """
-        <div class="feature-card">
-            <div class="feature-icon">🔎</div>
-            <div class="feature-title">Find Meaningful Changes</div>
-            <div class="feature-text">
-                Compare baseline and revised documents while filtering
-                out irrelevant drafting differences.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with feature2:
-
-    st.markdown(
-        """
-        <div class="feature-card">
-            <div class="feature-icon">⚠️</div>
-            <div class="feature-title">Understand Project Risk</div>
-            <div class="feature-text">
-                Identify potential cost, schedule, coordination,
-                documentation, and regulatory exposure.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-with feature3:
-
-    st.markdown(
-        """
-        <div class="feature-card">
-            <div class="feature-icon">📄</div>
-            <div class="feature-title">Create Actionable Reports</div>
-            <div class="feature-text">
-                Generate management-ready quick reports and detailed
-                supporting analysis.
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-st.write("")
-
-
-# ==========================================================
-# STEP 1
+# STEP 1 — PROJECT SETUP
 # ==========================================================
 
 st.markdown(
     """
-    <div class="section-label">Step 1</div>
-    <div class="section-title">Set up your project</div>
-    <div class="section-description">
-        Add basic project information that will appear in the analysis
+    <div class="section-number">Step 1</div>
+    <div class="section-title">Project setup</div>
+    <div class="section-copy">
+        Enter the project information that should appear in the analysis
         and generated reports.
     </div>
     """,
@@ -2420,26 +2537,50 @@ with st.container(border=True):
 
     with left:
 
+        st.markdown("#### Project name")
+        st.caption(
+            "The name used to identify this job."
+        )
+
         project_name = st.text_input(
-            "Project Name",
-            placeholder="Example: Building A Renovation"
+            "Project name input",
+            placeholder="Building A Renovation",
+            label_visibility="collapsed"
+        )
+
+        st.markdown("#### Contractor / company")
+        st.caption(
+            "The company reviewing or managing the project."
         )
 
         company_name = st.text_input(
-            "Contractor / Company",
-            placeholder="Example: ABC Construction"
+            "Company input",
+            placeholder="ABC Construction",
+            label_visibility="collapsed"
         )
 
     with right:
 
+        st.markdown("#### Project location")
+        st.caption(
+            "City and state where the work is located."
+        )
+
         project_location = st.text_input(
-            "Project Location",
-            placeholder="Example: Johnson City, Tennessee"
+            "Project location input",
+            placeholder="Johnson City, Tennessee",
+            label_visibility="collapsed"
+        )
+
+        st.markdown("#### Project number")
+        st.caption(
+            "Optional internal job number or reference."
         )
 
         project_reference = st.text_input(
-            "Project Number / Reference",
-            placeholder="Optional"
+            "Project reference input",
+            placeholder="26-1047",
+            label_visibility="collapsed"
         )
 
 
@@ -2447,16 +2588,16 @@ st.write("")
 
 
 # ==========================================================
-# STEP 2
+# STEP 2 — DOCUMENTS
 # ==========================================================
 
 st.markdown(
     """
-    <div class="section-label">Step 2</div>
-    <div class="section-title">Upload project documents</div>
-    <div class="section-description">
-        Add the baseline documents on the left and the newer or revised
-        documents on the right.
+    <div class="section-number">Step 2</div>
+    <div class="section-title">Project documents</div>
+    <div class="section-copy">
+        Upload the baseline documents and the documents you want
+        compared against them.
     </div>
     """,
     unsafe_allow_html=True
@@ -2468,32 +2609,32 @@ with upload_left:
 
     with st.container(border=True):
 
-        st.markdown("### Original / Baseline")
+        st.markdown("### Original / baseline")
 
         st.caption(
-            "Contract drawings, original scopes, specifications, "
-            "or previously approved documents."
+            "Original drawings, contract documents, scope exhibits, "
+            "specifications, or other baseline information."
         )
 
         original_files = st.file_uploader(
-            "Upload baseline PDFs",
+            "Original documents",
             type=["pdf"],
             accept_multiple_files=True,
-            key="original"
+            key="original_documents",
+            label_visibility="collapsed"
         )
 
         if original_files:
 
             st.success(
-                f"{len(original_files)} baseline "
-                f"document(s) ready"
+                f"{len(original_files)} document(s) ready"
             )
 
 with upload_right:
 
     with st.container(border=True):
 
-        st.markdown("### New / Revised")
+        st.markdown("### New / revised")
 
         st.caption(
             "Revised drawings, bulletins, RFIs, directives, "
@@ -2501,17 +2642,17 @@ with upload_right:
         )
 
         revised_files = st.file_uploader(
-            "Upload revised PDFs",
+            "Revised documents",
             type=["pdf"],
             accept_multiple_files=True,
-            key="revised"
+            key="revised_documents",
+            label_visibility="collapsed"
         )
 
         if revised_files:
 
             st.success(
-                f"{len(revised_files)} revised "
-                f"document(s) ready"
+                f"{len(revised_files)} document(s) ready"
             )
 
 
@@ -2519,16 +2660,15 @@ st.write("")
 
 
 # ==========================================================
-# STEP 3
+# STEP 3 — SETTINGS
 # ==========================================================
 
 st.markdown(
     """
-    <div class="section-label">Step 3</div>
-    <div class="section-title">Run the analysis</div>
-    <div class="section-description">
-        Choose how much visual drawing review you want and start the
-        comparison.
+    <div class="section-number">Step 3</div>
+    <div class="section-title">Analysis settings</div>
+    <div class="section-copy">
+        Configure the drawing review and start the comparison.
     </div>
     """,
     unsafe_allow_html=True
@@ -2536,48 +2676,55 @@ st.markdown(
 
 with st.container(border=True):
 
-    settings_left, settings_right = st.columns([1.3, 1])
+    setting_left, setting_right = st.columns(
+        [1.4, 1]
+    )
 
-    with settings_left:
+    with setting_left:
+
+        st.markdown(
+            "#### Visual drawing analysis"
+        )
 
         visual_analysis = st.checkbox(
-            "Visually analyze plan sheets",
-            value=True,
-            help=(
-                "Allows the AI to inspect rendered drawing pages "
-                "in addition to extracted PDF text."
-            )
+            "Review drawing pages visually",
+            value=True
         )
 
         st.caption(
-            "Recommended for architectural, structural, MEP, "
-            "and other graphical plan sets."
+            "Recommended for architectural, structural, "
+            "mechanical, electrical, and other graphical plans."
         )
 
-    with settings_right:
+    with setting_right:
+
+        st.markdown(
+            "#### Visual page limit"
+        )
 
         max_pages = st.number_input(
-            "Pages visually reviewed per PDF",
+            "Maximum pages",
             min_value=1,
             max_value=20,
-            value=6
+            value=6,
+            label_visibility="collapsed"
         )
 
         st.caption(
-            "Use 3–6 pages while testing to control processing cost."
+            "For early testing, 3–6 pages per PDF is a good range."
         )
 
     st.write("")
 
     analyze_clicked = st.button(
-        "Analyze Project →",
+        "Analyze project",
         type="primary",
         use_container_width=True
     )
 
 
 # ==========================================================
-# ANALYSIS
+# RUN ANALYSIS
 # ==========================================================
 
 if analyze_clicked:
@@ -2597,8 +2744,7 @@ if analyze_clicked:
     else:
 
         with st.spinner(
-            "Reviewing documents, comparing revisions, "
-            "and building the project risk analysis..."
+            "Reviewing project documents and comparing revisions..."
         ):
 
             try:
@@ -2610,11 +2756,13 @@ if analyze_clicked:
                 revised_images = []
 
 
-                # ORIGINAL DOCUMENTS
+                # ORIGINAL FILES
                 for file in original_files:
 
                     original_text += (
-                        extract_pdf_text(file)
+                        extract_pdf_text(
+                            file
+                        )
                     )
 
                     if visual_analysis:
@@ -2627,11 +2775,13 @@ if analyze_clicked:
                         )
 
 
-                # REVISED DOCUMENTS
+                # REVISED FILES
                 for file in revised_files:
 
                     revised_text += (
-                        extract_pdf_text(file)
+                        extract_pdf_text(
+                            file
+                        )
                     )
 
                     if visual_analysis:
@@ -2676,7 +2826,7 @@ NEW / REVISED DOCUMENT TEXT
 
 Compare these documents using the required report structure.
 
-Use supplied project documents as the primary evidence.
+Use supplied documents as the primary evidence.
 
 If user-entered information conflicts with the project documents,
 report the conflict rather than silently resolving it.
@@ -2694,6 +2844,7 @@ or drafting differences.
                 ]
 
 
+                # ORIGINAL IMAGES
                 for image in original_images:
 
                     content.append(
@@ -2716,6 +2867,7 @@ or drafting differences.
                     )
 
 
+                # REVISED IMAGES
                 for image in revised_images:
 
                     content.append(
@@ -2757,19 +2909,32 @@ or drafting differences.
 
 
                 st.session_state["analysis"] = analysis
-                st.session_state["project_name"] = project_name
-                st.session_state["project_location"] = project_location
-                st.session_state["company_name"] = company_name
-                st.session_state["project_reference"] = project_reference
+
+                st.session_state[
+                    "project_name"
+                ] = project_name
+
+                st.session_state[
+                    "project_location"
+                ] = project_location
+
+                st.session_state[
+                    "company_name"
+                ] = company_name
+
+                st.session_state[
+                    "project_reference"
+                ] = project_reference
+
 
                 st.success(
-                    "Analysis complete. Review the results below."
+                    "Analysis complete."
                 )
 
             except Exception as error:
 
                 st.error(
-                    "The project analysis could not be completed."
+                    "The analysis could not be completed."
                 )
 
                 st.code(
@@ -2783,18 +2948,20 @@ or drafting differences.
 
 if "analysis" in st.session_state:
 
-    analysis = st.session_state["analysis"]
+    analysis = st.session_state[
+        "analysis"
+    ]
 
     st.write("")
     st.write("")
 
     st.markdown(
         """
-        <div class="section-label">Analysis Complete</div>
-        <div class="section-title">Project Intelligence Dashboard</div>
-        <div class="section-description">
-            Review the highest-priority findings before opening the
-            detailed project analysis.
+        <div class="section-number">Results</div>
+        <div class="section-title">Project review</div>
+        <div class="section-copy">
+            Review the highest-priority findings first, then open the
+            detailed sections as needed.
         </div>
         """,
         unsafe_allow_html=True
@@ -2802,7 +2969,7 @@ if "analysis" in st.session_state:
 
 
     # ======================================================
-    # DASHBOARD METRICS
+    # METRICS
     # ======================================================
 
     scope_change = extract_field(
@@ -2825,8 +2992,10 @@ if "analysis" in st.session_state:
         "REVIEW BEFORE PROCEEDING"
     )
 
-    changes_found = count_change_register_items(
-        analysis
+    changes_found = (
+        count_change_register_items(
+            analysis
+        )
     )
 
     red_flags = count_risk_flags(
@@ -2834,34 +3003,35 @@ if "analysis" in st.session_state:
         "RED"
     )
 
-
-    metric1, metric2, metric3, metric4 = st.columns(4)
+    metric1, metric2, metric3, metric4 = st.columns(
+        4
+    )
 
     with metric1:
 
         st.metric(
-            "Scope Change",
+            "Scope change",
             scope_change
         )
 
     with metric2:
 
         st.metric(
-            "Overall Severity",
+            "Severity",
             severity
         )
 
     with metric3:
 
         st.metric(
-            "Changes Found",
+            "Changes identified",
             changes_found
         )
 
     with metric4:
 
         st.metric(
-            "Red Flags",
+            "Red flags",
             red_flags
         )
 
@@ -2870,34 +3040,36 @@ if "analysis" in st.session_state:
 
 
     # ======================================================
-    # STATUS STRIP
+    # REVIEW STATUS
     # ======================================================
 
     with st.container(border=True):
 
-        status_left, status_middle, status_right = st.columns(3)
+        status1, status2, status3 = st.columns(
+            3
+        )
 
-        with status_left:
+        with status1:
 
             st.markdown(
-                "**Analysis Confidence**"
+                "**Analysis confidence**"
             )
 
             st.write(
                 confidence
             )
 
-        with status_middle:
+        with status2:
 
             st.markdown(
-                "**Review Before Proceeding**"
+                "**Review before proceeding**"
             )
 
             st.write(
                 review_status
             )
 
-        with status_right:
+        with status3:
 
             st.markdown(
                 "**Project**"
@@ -2908,6 +3080,7 @@ if "analysis" in st.session_state:
                     "project_name",
                     "Not provided"
                 )
+                or "Not provided"
             )
 
 
@@ -2918,11 +3091,11 @@ if "analysis" in st.session_state:
     # RESULT TABS
     # ======================================================
 
-    summary_tab, changes_tab, full_tab = st.tabs(
+    summary_tab, change_tab, full_tab = st.tabs(
         [
-            "Executive Summary",
-            "Change Register",
-            "Full Analysis"
+            "Executive summary",
+            "Change register",
+            "Full analysis"
         ]
     )
 
@@ -2936,7 +3109,7 @@ if "analysis" in st.session_state:
             )
         )
 
-        st.markdown("---")
+        st.divider()
 
         st.markdown(
             section_text(
@@ -2946,7 +3119,7 @@ if "analysis" in st.session_state:
         )
 
 
-    with changes_tab:
+    with change_tab:
 
         st.markdown(
             section_text(
@@ -2955,7 +3128,7 @@ if "analysis" in st.session_state:
             )
         )
 
-        st.markdown("---")
+        st.divider()
 
         st.markdown(
             section_text(
@@ -2973,7 +3146,7 @@ if "analysis" in st.session_state:
 
 
     # ======================================================
-    # CREATE REPORTS
+    # CREATE PDF REPORTS
     # ======================================================
 
     quick_pdf = create_pdf_report(
@@ -3029,7 +3202,10 @@ if "analysis" in st.session_state:
             "Project"
         )
         .strip()
-        .replace(" ", "_")
+        .replace(
+            " ",
+            "_"
+        )
     )
 
     if not safe_name:
@@ -3037,7 +3213,7 @@ if "analysis" in st.session_state:
 
 
     # ======================================================
-    # DOWNLOAD SECTION
+    # EXPORT
     # ======================================================
 
     st.write("")
@@ -3045,35 +3221,36 @@ if "analysis" in st.session_state:
 
     st.markdown(
         """
-        <div class="section-label">Export</div>
-        <div class="section-title">Download project reports</div>
-        <div class="section-description">
-            Use the Quick Report for management review and the Full
-            Report for detailed supporting analysis.
+        <div class="section-number">Export</div>
+        <div class="section-title">Project reports</div>
+        <div class="section-copy">
+            Download a short management report or the complete
+            supporting analysis.
         </div>
         """,
         unsafe_allow_html=True
     )
 
+    export_left, export_right = st.columns(
+        2
+    )
 
-    download_left, download_right = st.columns(2)
 
-
-    with download_left:
+    with export_left:
 
         with st.container(border=True):
 
             st.markdown(
-                "### Quick Report"
+                "### Quick report"
             )
 
             st.caption(
-                "Executive summary, major risks, change register, "
-                "risk flags, and recommended actions."
+                "Executive summary, major project risks, "
+                "change register, risk flags, and recommended actions."
             )
 
             st.download_button(
-                "Download Quick Report",
+                "Download quick report",
                 data=quick_pdf,
                 file_name=(
                     f"{safe_name}_Quick_Report.pdf"
@@ -3083,22 +3260,21 @@ if "analysis" in st.session_state:
             )
 
 
-    with download_right:
+    with export_right:
 
         with st.container(border=True):
 
             st.markdown(
-                "### Full Analysis"
+                "### Full analysis"
             )
 
             st.caption(
-                "Detailed scope comparison, technical analysis, "
-                "cost, schedule, coordination, documentation, "
-                "and supporting references."
+                "Detailed scope comparison, cost and schedule review, "
+                "coordination issues, document risk, and references."
             )
 
             st.download_button(
-                "Download Full Report",
+                "Download full report",
                 data=full_pdf,
                 file_name=(
                     f"{safe_name}_Full_Scope_Analysis.pdf"
@@ -3114,10 +3290,10 @@ if "analysis" in st.session_state:
 
 st.markdown(
     """
-    <div class="site-footer">
-        Construction Scope AI • Preliminary construction-management
-        analysis • Findings should be verified against current project
-        documents and qualified project personnel.
+    <div class="footer">
+        Construction Scope AI · Preliminary construction-management
+        analysis · Verify findings against current project documents
+        and qualified project personnel.
     </div>
     """,
     unsafe_allow_html=True
